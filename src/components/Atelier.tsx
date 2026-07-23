@@ -4,7 +4,6 @@ import { Leaf, ArrowRight, Play, Calendar, Clock } from 'lucide-react';
 
 const steps = [
   {
-    num: '01',
     titleKey: 'atelier.step1.title',
     descKey: 'atelier.step1.desc',
     image: '/recolte.jpg',
@@ -13,7 +12,6 @@ const steps = [
     season: 'Printemps - Été'
   },
   {
-    num: '02',
     titleKey: 'atelier.step2.title',
     descKey: 'atelier.step2.desc',
     image: '/peignage.jpg',
@@ -22,7 +20,6 @@ const steps = [
     season: 'Toute l\'année'
   },
   {
-    num: '03',
     titleKey: 'atelier.step3.title',
     descKey: 'atelier.step3.desc',
     image: '/1.jpg',
@@ -31,7 +28,6 @@ const steps = [
     season: 'Automne - Hiver'
   },
   {
-    num: '04',
     titleKey: 'atelier.step4.title',
     descKey: 'atelier.step4.desc',
     image: '/crochage.jpg',
@@ -77,11 +73,11 @@ const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, in
           {/* Overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
-          {/* Badge étape */}
+          {/* Badge étape - sans numéro */}
           <div className="absolute top-4 left-4">
             <span className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm text-[#2E4033] px-4 py-1.5 rounded-full text-xs font-medium shadow-lg">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: step.color }} />
-              Étape {step.num}
+              {t(step.titleKey)}
             </span>
           </div>
 
@@ -101,11 +97,8 @@ const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, in
 
       {/* Contenu - Style Airbnb */}
       <div className="flex-1 flex flex-col justify-center space-y-4 md:space-y-5">
-        {/* Numéro avec ligne */}
+        {/* Ligne décorative */}
         <div className="flex items-center gap-4">
-          <span className="font-serif text-5xl lg:text-6xl font-light text-[#2E4033]/10">
-            {step.num}
-          </span>
           <div className="flex-1 h-px bg-[#2E4033]/10" />
         </div>
         
@@ -129,7 +122,11 @@ const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, in
           </span>
         </div>
 
-  
+        {/* Bouton "En savoir plus" */}
+        <button className="group inline-flex items-center gap-2 text-sm font-medium text-[#C97A53] hover:text-[#a8623e] transition-colors pt-2">
+          <span>En savoir plus</span>
+          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+        </button>
       </div>
     </div>
   );
@@ -190,10 +187,10 @@ const Atelier: React.FC = () => {
           </div>
         </div>
 
-        {/* Steps */}
+        {/* Steps - Sans numérotation */}
         <div className="space-y-16 lg:space-y-20">
           {steps.map((step, i) => (
-            <StepCard key={step.num} step={step} index={i} />
+            <StepCard key={i} step={step} index={i} />
           ))}
         </div>
 
