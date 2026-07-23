@@ -1,39 +1,39 @@
-import { useState } from 'react'
-import { useLang } from '../context/LangContext'
+import React, { useState } from 'react';
+import { useLang } from '../contexts/LanguageContext';
 
-const WHATSAPP_NUMBER = '261347640116'
+const WhatsAppButton: React.FC = () => {
+  const { lang } = useLang();
+  const [showTooltip, setShowTooltip] = useState(false);
 
-export function WhatsAppButton() {
-  const { t } = useLang()
-  const [showTooltip, setShowTooltip] = useState(true)
-
-  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.whatsapp.defaultMessage)}`
+  const message = lang === 'fr'
+    ? 'Bonjour Boutique Mahalia / Nature Raphia 👋\nJe suis intéressé(e) par vos créations.'
+    : 'Hello Boutique Mahalia / Nature Raphia 👋\nI am interested in your creations.';
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2 sm:bottom-7 sm:right-7">
+    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2">
+      {/* Tooltip */}
       {showTooltip && (
-        <div className="relative max-w-[220px] rounded-xl bg-white px-4 py-3 text-sm text-[var(--color-olive)] shadow-lg shadow-black/10 sm:max-w-[240px]">
-          <button
-            onClick={() => setShowTooltip(false)}
-            aria-label="close"
-            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-olive)] text-[10px] text-white"
-          >
-            ✕
-          </button>
-          {t.whatsapp.tooltip}
+        <div className="bg-[#2E4033] text-white text-xs rounded-xl px-3 py-2 shadow-lg whitespace-nowrap animate-fade-in-up">
+          {lang === 'fr' ? 'Discuter sur WhatsApp' : 'Chat on WhatsApp'}
         </div>
       )}
+
+      {/* Button */}
       <a
-        href={href}
+        href={`https://wa.me/261347640116?text=${encodeURIComponent(message)}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={t.whatsapp.label}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-transform hover:scale-105"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        className="w-14 h-14 bg-[#25D366] hover:bg-[#1ebe5b] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/40 transition-all duration-200 hover:scale-110 animate-float"
+        aria-label="Contact WhatsApp"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" className="h-7 w-7">
-          <path d="M16.001 3C9.096 3 3.5 8.596 3.5 15.5c0 2.487.71 4.808 1.94 6.782L3 29l6.94-2.36a12.42 12.42 0 0 0 6.06 1.56c6.905 0 12.5-5.596 12.5-12.5S22.906 3 16.001 3zm0 22.7a10.16 10.16 0 0 1-5.19-1.42l-.372-.22-4.12 1.4 1.42-4.02-.24-.39a10.17 10.17 0 0 1-1.598-5.55c0-5.63 4.58-10.2 10.2-10.2 5.63 0 10.2 4.58 10.2 10.2 0 5.63-4.57 10.2-10.2 10.2zm5.6-7.64c-.31-.155-1.82-.9-2.1-1-.28-.104-.484-.155-.688.155-.204.31-.79 1-1 1.2-.18.18-.36.2-.66.05-1.79-.9-2.97-1.6-4.16-3.62-.31-.53.31-.49.89-1.63.1-.2.05-.37-.05-.52-.1-.16-.72-1.73-.98-2.36-.26-.63-.53-.55-.72-.56-.19-.01-.4-.01-.62-.01-.21 0-.55.08-.85.4-.3.31-1.14 1.12-1.14 2.73 0 1.61 1.17 3.17 1.33 3.39.16.22 2.24 3.43 5.44 4.68 2.71 1.05 3.26.85 3.85.79.59-.06 1.82-.75 2.08-1.47.26-.72.26-1.34.18-1.47-.08-.13-.31-.2-.62-.35z" />
+        <svg viewBox="0 0 24 24" fill="white" className="w-7 h-7">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
         </svg>
       </a>
     </div>
-  )
-}
+  );
+};
+
+export default WhatsAppButton;

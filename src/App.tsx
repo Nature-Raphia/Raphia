@@ -1,41 +1,46 @@
-import { useEffect } from 'react'
-import { Navbar } from './components/Navbar'
-import { Hero } from './sections/Hero'
-import { Atelier } from './sections/Atelier'
-import { Showroom } from './sections/Showroom'
-import { Engagements } from './sections/Engagements'
-import { Contact } from './sections/Contact'
-import { Footer } from './components/Footer'
-import { WhatsAppButton } from './components/WhatsAppButton'
-import { CartDrawer } from './components/CartDrawer'
-import { QuoteModal } from './components/QuoteModal'
-import { useLang } from './context/LangContext'
+import React, { useState } from 'react';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { CartProvider } from './contexts/CartContext';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Atelier from './components/Atelier';
+import Showroom from './components/Showroom';
+import RSE from './components/RSE';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import CartSidebar from './components/CartSidebar';
+import WhatsAppButton from './components/WhatsAppButton';
+import AdminPanel from './pages/AdminPanel';
 
-function App() {
-  const { t } = useLang()
-
-  useEffect(() => {
-    document.title = t.meta.title
-    const metaDesc = document.querySelector('meta[name="description"]')
-    if (metaDesc) metaDesc.setAttribute('content', t.meta.description)
-  }, [t])
+const AppContent: React.FC = () => {
+  const [showAdmin, setShowAdmin] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--color-ivory)]">
-      <Navbar />
+    <>
+      <Navbar onAdminClick={() => setShowAdmin(true)} />
       <main>
         <Hero />
-        <Atelier />
         <Showroom />
-        <Engagements />
+        <Atelier />
+
+
+        <RSE />
         <Contact />
       </main>
       <Footer />
+      <CartSidebar />
       <WhatsAppButton />
-      <CartDrawer />
-      <QuoteModal />
-    </div>
-  )
-}
+      {showAdmin && <AdminPanel onClose={() => setShowAdmin(false)} />}
+    </>
+  );
+};
 
-export default App
+const App: React.FC = () => (
+  <LanguageProvider>
+    <CartProvider>
+      <AppContent />
+    </CartProvider>
+  </LanguageProvider>
+);
+
+export default App;

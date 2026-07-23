@@ -1,32 +1,42 @@
-export type Lang = 'fr' | 'en'
-
-export type ProductCategory = 'sacs' | 'chapeaux' | 'decoration'
-
-export interface LocalizedText {
-  fr: string
-  en: string
-}
-
 export interface Product {
-  id: string
-  name: LocalizedText
-  description: LocalizedText
-  category: ProductCategory
-  image: string
-  instagram?: boolean
+  id: string;
+  name: { fr: string; en: string };
+  category: 'sacs' | 'chapeaux' | 'decoration' | 'pochettes';
+  price: number;
+  description: { fr: string; en: string };
+  image: string;
+  materials: { fr: string; en: string };
+  inStock: boolean;
+  featured: boolean;
+  badge?: { fr: string; en: string };
 }
 
 export interface CartItem {
-  product: Product
-  quantity: number
+  product: Product;
+  quantity: number;
 }
 
-export type BuyerProfile = 'particulier' | 'grossiste'
+export interface QuoteRequest {
+  id: string;
+  items: CartItem[];
+  customer: {
+    name: string;
+    email: string;
+    country: string;
+    profile: 'particulier' | 'grossiste';
+    message?: string;
+    phone?: string;
+  };
+  status: 'nouveau' | 'en_cours' | 'traite' | 'archive';
+  createdAt: string;
+  totalEstimate?: number;
+}
 
-export interface QuoteRequestPayload {
-  name: string
-  email: string
-  country: string
-  buyerProfile: BuyerProfile
-  items: CartItem[]
+export type Language = 'fr' | 'en';
+
+export interface AdminStats {
+  totalQuotes: number;
+  newQuotes: number;
+  totalProducts: number;
+  monthlyRequests: number;
 }
