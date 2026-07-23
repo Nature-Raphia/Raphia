@@ -122,11 +122,7 @@ const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, in
           </span>
         </div>
 
-        {/* Bouton "En savoir plus" */}
-        <button className="group inline-flex items-center gap-2 text-sm font-medium text-[#C97A53] hover:text-[#a8623e] transition-colors pt-2">
-          <span>En savoir plus</span>
-          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
-        </button>
+     
       </div>
     </div>
   );
