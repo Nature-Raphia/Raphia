@@ -38,10 +38,12 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-full bg-[#2E4033] flex items-center justify-center group-hover:bg-[#C97A53] transition-colors">
-                <span className="text-[#FAF7F2] text-xs font-bold font-serif">NR</span>
-              </div>
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 group">
+              <img
+                src="/logo.jpeg"
+                alt="Nature Raphia & Mahalia"
+                className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
               <div className="hidden sm:flex flex-col leading-tight">
                 <span className="font-serif text-sm font-semibold text-[#2E4033]">Nature Raphia</span>
                 <span className="text-[10px] text-[#C97A53] tracking-widest uppercase font-medium">& Boutique Mahalia</span>

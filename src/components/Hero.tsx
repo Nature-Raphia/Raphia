@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, ArrowRight } from 'lucide-react';
+import { ChevronDown, ArrowRight, Leaf, Award, Handshake } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 
 const Hero: React.FC = () => {
@@ -18,92 +18,102 @@ const Hero: React.FC = () => {
 
   return (
     <section id="accueil" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background */}
+      {/* Background avec overlay plus doux et texturé */}
       <div className="absolute inset-0 z-0">
         <img
           src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=1920&q=85"
           alt="Nature Raphia Hero"
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2E4033]/80 via-[#2E4033]/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2E4033]/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2E4033]/85 via-[#2E4033]/60 to-[#2E4033]/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1A261E]/80 via-[#2E4033]/30 to-transparent" />
+        <div className="absolute inset-0 bg-[#2E4033]/20 backdrop-blur-[1px]" />
       </div>
 
-      {/* Floating decorative elements */}
-      <div className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full bg-[#C97A53]/10 blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/3 right-1/3 w-40 h-40 rounded-full bg-[#FAF7F2]/10 blur-2xl animate-pulse" style={{animationDelay:'1s'}} />
+      {/* Éléments décoratifs */}
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-[#C97A53]/10 blur-3xl animate-pulse-slow" />
+      <div className="absolute bottom-1/3 left-1/4 w-72 h-72 rounded-full bg-[#E6DFD3]/10 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-2/3 right-1/3 w-48 h-48 rounded-full bg-[#D4A373]/10 blur-2xl animate-pulse-slow" style={{ animationDelay: '4s' }} />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <div className="max-w-2xl">
-          {/* Location badge */}
-          <div className={`inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6 transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+      {/* Contenu principal - LARGEUR RÉDUITE */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+        <div className="max-w-2xl"> {/* Réduit de max-w-3xl à max-w-2xl */}
+
+          {/* Badge de localisation */}
+          <div className={`inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full px-5 py-2 mb-8 transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <span className="w-2 h-2 rounded-full bg-[#C97A53] animate-pulse" />
-            <span className="text-white/90 text-xs tracking-widest uppercase font-medium">{t('hero.location')}</span>
+            <span className="text-white/80 text-xs tracking-[0.15em] uppercase font-light">
+              {t('hero.location')}
+            </span>
+            <span className="w-px h-4 bg-white/20" />
+            <Leaf size={12} className="text-[#C97A53]" />
           </div>
 
-          {/* Title */}
-          <h1 className={`font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-tight mb-6 transition-all duration-700 delay-100 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          {/* Titre principal */}
+          <h1 className={`font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.1] mb-8 transition-all duration-700 delay-100 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             {t('hero.title').split('\n').map((line, i) => (
               <span key={i} className="block">
-                {i === 2 ? <span className="italic text-[#E6DFD3]">{line}</span> : line}
+                {i === 2 ? (
+                  <span className="font-medium italic text-[#E6DFD3]">{line}</span>
+                ) : (
+                  <span className="font-light">{line}</span>
+                )}
               </span>
             ))}
           </h1>
 
-          {/* Subtitle */}
-          <p className={`text-white/80 text-base sm:text-lg leading-relaxed mb-8 max-w-lg transition-all duration-700 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          {/* Sous-titre */}
+          <p className={`text-white/70 text-base sm:text-lg leading-relaxed max-w-xl mb-10 transition-all duration-700 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             {t('hero.subtitle')}
           </p>
 
-          {/* CTA Buttons */}
-          <div className={`flex flex-wrap gap-3 transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <button onClick={() => scrollTo('showroom')}
-              className="flex items-center gap-2 bg-[#C97A53] hover:bg-[#a8623e] text-white px-6 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-105 shadow-lg shadow-[#C97A53]/30">
+          {/* Boutons CTA */}
+          <div className={`flex flex-wrap items-center gap-4 transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <button 
+              onClick={() => scrollTo('showroom')}
+              className="group flex items-center gap-3 bg-[#C97A53] hover:bg-[#a8623e] text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#C97A53]/40"
+            >
               {t('hero.cta.collection')}
-              <ArrowRight size={16} />
+              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
             </button>
-            <button onClick={() => scrollTo('atelier')}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 py-3 rounded-full font-medium text-sm transition-all duration-200">
+            <button 
+              onClick={() => scrollTo('atelier')}
+              className="group flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300"
+            >
               {t('hero.cta.atelier')}
             </button>
           </div>
-        </div>
 
-        {/* Stats */}
-        <div className={`mt-16 flex flex-wrap gap-8 transition-all duration-700 delay-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          {[
-            { value: '12+', label: { fr: "Ans d'expertise", en: "Years of expertise" } },
-            { value: '40+', label: { fr: 'Artisanes', en: 'Artisans' } },
-            { value: '100%', label: { fr: 'Naturel', en: 'Natural' } },
-          ].map((stat, i) => (
-            <div key={i} className="text-white/90">
-              <div className="font-serif text-3xl font-semibold text-[#E6DFD3]">{stat.value}</div>
-              <div className="text-xs text-white/60 mt-1 uppercase tracking-widest">{stat.label.fr}</div>
-            </div>
-          ))}
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <button onClick={() => scrollTo('atelier')}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors animate-bounce z-10">
-        <span className="text-xs uppercase tracking-widest">{t('hero.scroll')}</span>
-        <ChevronDown size={20} />
+      {/* Indicateur de scroll */}
+      <button 
+        onClick={() => scrollTo('atelier')}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/40 hover:text-white/70 transition-colors duration-300 z-10 group"
+      >
+        <span className="text-[10px] uppercase tracking-[0.2em] font-light">{t('hero.scroll')}</span>
+        <ChevronDown size={18} className="animate-bounce group-hover:translate-y-1 transition-transform" />
       </button>
 
-      {/* Product preview floating card */}
-      <div className={`hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 z-10 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16'}`}>
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 w-52">
-          <img
-            src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&q=80"
-            alt="Cabas Solstice"
-            className="w-full h-40 object-cover rounded-xl mb-3"
-          />
+      {/* Carte produit flottante */}
+      <div className={`hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 z-10 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16'}`}>
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-56 shadow-2xl shadow-black/20 hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
+          <div className="relative overflow-hidden rounded-xl mb-4">
+            <img
+              src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&q=80"
+              alt="Cabas Solstice"
+              className="w-full h-44 object-cover transition-transform duration-500 hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          </div>
           <div className="text-white">
-            <div className="text-xs text-white/60 uppercase tracking-widest mb-1">Pièce signature</div>
-            <div className="font-serif text-sm font-medium">Cabas Solstice</div>
-            <div className="text-[#C97A53] font-semibold text-sm mt-1">85 €</div>
+            <div className="text-[10px] text-white/40 uppercase tracking-[0.15em] mb-1">Pièce signature</div>
+            <div className="font-serif text-sm font-light">Cabas Solstice</div>
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-[#C97A53] font-light text-sm">85 €</span>
+              <span className="text-[10px] text-white/30 uppercase tracking-widest border border-white/10 rounded-full px-3 py-0.5">Raphia</span>
+            </div>
           </div>
         </div>
       </div>
