@@ -22,8 +22,6 @@ const AppContent: React.FC = () => {
         <Hero />
         <Showroom />
         <Atelier />
-
-
         <RSE />
         <Contact />
       </main>

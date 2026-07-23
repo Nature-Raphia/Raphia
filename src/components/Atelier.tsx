@@ -7,32 +7,32 @@ const steps = [
     num: '01',
     titleKey: 'atelier.step1.title',
     descKey: 'atelier.step1.desc',
-    icon: '🌴',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+
+    image: '/recolte.jpg',
     color: '#C97A53',
   },
   {
     num: '02',
     titleKey: 'atelier.step2.title',
     descKey: 'atelier.step2.desc',
-    icon: '✋',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+   
+    image: '/peignage.jpg',
     color: '#2E4033',
   },
   {
     num: '03',
     titleKey: 'atelier.step3.title',
     descKey: 'atelier.step3.desc',
-    icon: '🌿',
-    image: 'https://images.unsplash.com/photo-1584680226833-0d8d4a2b9452?w=400&q=80',
+   
+    image: '/1.jpg',
     color: '#4a6741',
   },
   {
     num: '04',
     titleKey: 'atelier.step4.title',
     descKey: 'atelier.step4.desc',
-    icon: '🧶',
-    image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&q=80',
+    
+    image: 'crochage.jpg',
     color: '#C97A53',
   },
 ];
@@ -71,7 +71,7 @@ const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, in
             <span 
               className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-[#2E4033] px-2.5 py-1 rounded-full text-[10px] font-medium"
             >
-              <span>{step.icon}</span>
+             
               <span>{step.num}</span>
             </span>
           </div>
@@ -88,7 +88,7 @@ const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, in
               border: `1.5px solid ${step.color}`,
             }}
           >
-            <span>{step.icon}</span>
+           
           </div>
           <span className="text-xs font-medium uppercase tracking-wider" style={{ color: step.color }}>
             Étape {step.num}
