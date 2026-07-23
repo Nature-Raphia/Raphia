@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Fraunces", "Times New Roman", serif;
+  --font-sans: "Manrope", "Helvetica Neue", Arial, sans-serif;
+
+  --color-ivory: #faf7f2;
+  --color-olive: #2e4033;
+  --color-olive-light: #4a5f4e;
+  --color-terracotta: #c97a53;
+  --color-terracotta-dark: #b3663f;
+  --color-sand: #e6dfd3;
+  --color-sand-dark: #d9cfba;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-ivory);
+  color: var(--color-olive);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4,
+.font-serif-display {
+  font-family: var(--font-serif);
+}
+
+::selection {
+  background-color: var(--color-terracotta);
+  color: var(--color-ivory);
+}
+
+/* Custom thin scrollbar for cart drawer */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-sand-dark);
+  border-radius: 999px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease forwards;
+}
+
+@keyframes cart-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.35); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.animate-cart-pop {
+  animation: cart-pop 0.5s ease;
+}
+
+.leaflet-container {
+  font-family: var(--font-sans);
+}
