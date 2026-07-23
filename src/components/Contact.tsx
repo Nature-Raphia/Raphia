@@ -1,52 +1,90 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Send, Building2 } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
+import { contactService } from '../services/contactService';
+import { contactEmailService } from '../services/contactEmailService';
 
 const ContactMap: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
-    let map: any = null;
+    // Nettoyer l'instance précédente si elle existe
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
+
     const initMap = async () => {
-      if (!mapRef.current) return;
-      const L = await import('leaflet');
-      if (map) return;
-      // Antsirabe coordinates
-      const lat = -19.8659;
-      const lng = 47.0333;
-      map = L.map(mapRef.current).setView([lat, lng], 14);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
-      const icon = L.divIcon({
-        html: `<div style="background:#C97A53;color:white;border-radius:50% 50% 50% 0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3);border:2px solid white;"><span style="transform:rotate(45deg)">🏪</span></div>`,
-        className: '',
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-      });
-      L.marker([lat, lng], { icon }).addTo(map)
-        .bindPopup(`
-          <div style="font-family:'Inter',sans-serif;min-width:180px">
-            <strong style="color:#2E4033;font-size:13px">Boutique Mahalia</strong><br/>
-            <small style="color:#C97A53">Nature Raphia</small><br/>
-            <hr style="border:none;border-top:1px solid #E6DFD3;margin:6px 0"/>
-            <small style="color:#666">📍 Rue de l'Indépendance<br/>Antsirabe 110, Madagascar</small>
-          </div>
-        `, { maxWidth: 220 })
-        .openPopup();
+      // Vérifier que le conteneur existe et n'a pas déjà une carte
+      if (!mapRef.current || mapInstanceRef.current) return;
+
+      try {
+        const L = await import('leaflet');
+
+        const lat = -19.8659;
+        const lng = 47.0333;
+        const map = L.map(mapRef.current, {
+          center: [lat, lng],
+          zoom: 14,
+          zoomControl: true
+        });
+        mapInstanceRef.current = map;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const icon = L.divIcon({
+          html: `<div style="background:#C97A53;color:white;border-radius:50% 50% 50% 0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3);border:2px solid white;"><span style="transform:rotate(45deg)">🏪</span></div>`,
+          className: '',
+          iconSize: [36, 36],
+          iconAnchor: [18, 36],
+        });
+
+        L.marker([lat, lng], { icon }).addTo(map)
+          .bindPopup(`
+            <div style="font-family:'Inter',sans-serif;min-width:180px">
+              <strong style="color:#2E4033;font-size:13px">Boutique Mahalia</strong><br/>
+              <small style="color:#C97A53">Nature Raphia</small><br/>
+              <hr style="border:none;border-top:1px solid #E6DFD3;margin:6px 0"/>
+              <small style="color:#666">📍 Rue de l'Indépendance<br/>Antsirabe 110, Madagascar</small>
+            </div>
+          `, { maxWidth: 220 })
+          .openPopup();
+
+        // Forcer le redimensionnement après le chargement
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 500);
+
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de la carte:', error);
+      }
     };
-    initMap();
-    return () => { if (map) { map.remove(); map = null; } };
+
+    // Attendre que le DOM soit prêt
+    const timer = setTimeout(() => {
+      initMap();
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, []);
 
   return <div ref={mapRef} className="w-full h-full rounded-2xl" style={{ minHeight: 320 }} />;
 };
-
 const Contact: React.FC = () => {
   const { t } = useLang();
   const [b2bForm, setB2bForm] = useState({ company: '', contact: '', email: '', country: '', message: '' });
   const [b2bSent, setB2bSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -59,9 +97,53 @@ const Contact: React.FC = () => {
   const handleB2B = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    setB2bSent(true);
+    setError(null);
+
+    try {
+      // 1. Sauvegarder dans Supabase
+      const result = await contactService.submit({
+        name: b2bForm.contact,
+        email: b2bForm.email,
+        phone: '',
+        subject: b2bForm.company,
+        message: b2bForm.message || `Pays: ${b2bForm.country}`,
+      });
+
+      if (!result) {
+        throw new Error('Erreur lors de l\'envoi du formulaire');
+      }
+
+      // 2. Envoyer un email à l'admin via EmailJS
+      await contactEmailService.sendContactEmail({
+        name: b2bForm.contact,
+        email: b2bForm.email,
+        phone: '',
+        subject: `Demande B2B - ${b2bForm.company}`,
+        message: `
+Message du formulaire B2B :
+- Société : ${b2bForm.company}
+- Contact : ${b2bForm.contact}
+- Email : ${b2bForm.email}
+- Pays : ${b2bForm.country}
+- Message : ${b2bForm.message || 'Aucun message'}
+        `.trim(),
+        type: 'b2b'
+      });
+
+      setB2bSent(true);
+      
+      // Réinitialiser le formulaire après 5 secondes
+      setTimeout(() => {
+        setB2bSent(false);
+        setB2bForm({ company: '', contact: '', email: '', country: '', message: '' });
+      }, 5000);
+
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi:', error);
+      setError('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const infos = [
@@ -150,9 +232,15 @@ const Contact: React.FC = () => {
                   <span className="text-3xl">✓</span>
                 </div>
                 <p className="text-white font-medium">{t('contact.b2b.success')}</p>
+                <p className="text-white/50 text-sm mt-2">Un email a été envoyé à l'administrateur.</p>
               </div>
             ) : (
               <form onSubmit={handleB2B} className="space-y-4">
+                {error && (
+                  <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-sm">
+                    {error}
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"

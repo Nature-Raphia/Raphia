@@ -3,6 +3,7 @@ import { X, Minus, Plus, Trash2, ShoppingBag, Send, ArrowRight, CheckCircle } fr
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { QuoteRequest } from '../types';
+import { quoteService } from '../services/quoteService';
 
 const QuoteForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const { t, lang } = useLang();
@@ -13,7 +14,6 @@ const QuoteForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
 
     const quote: QuoteRequest = {
       id: `Q-${Date.now()}`,
@@ -23,10 +23,16 @@ const QuoteForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       createdAt: new Date().toISOString(),
       totalEstimate: totalPrice,
     };
-    addQuote(quote);
-    clearCart();
+
+    const result = await quoteService.submit(quote);
+
+    if (result) {
+      addQuote(quote);
+      clearCart();
+      onSuccess();
+    }
+
     setLoading(false);
-    onSuccess();
   };
 
   return (

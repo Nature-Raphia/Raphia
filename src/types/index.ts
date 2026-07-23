@@ -1,7 +1,7 @@
 export interface Product {
   id: string;
   name: { fr: string; en: string };
-  category: 'sacs' | 'chapeaux' | 'decoration' | 'pochettes';
+  category: string;
   price: number;
   description: { fr: string; en: string };
   image: string;
