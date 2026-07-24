@@ -97,7 +97,7 @@ const Contact: React.FC = () => {
   const [visible, setVisible] = useState(false);
 
   // Numéro WhatsApp officiel pour les demandes B2B
-  const WHATSAPP_B2B_NUMBER = '261379943312';
+  const WHATSAPP_B2B_NUMBER = '261347640116';
   const WHATSAPP_OFFICIAL_NUMBER = '261347640116';
 
   useEffect(() => {
