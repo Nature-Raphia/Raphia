@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import emailjs from '@emailjs/browser';
 import { CartItem, Product, QuoteRequest } from '../types';
 import { contactEmailService } from '../services/contactEmailService';
-import { whatsappService } from '../services/whatsappService';
 
 interface CartContextType {
   items: CartItem[];
@@ -93,7 +92,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const formatWhatsAppQuoteMessage = useCallback((quote: QuoteRequest) => {
-    const items = quote.items.map(item => `${item.product.name.fr} x${item.quantity}`).join(', ');
+    const items = quote.items.map(item => `- ${item.product.name.fr} x${item.quantity}`).join('\n');
     const total = (quote.totalEstimate || 0).toLocaleString();
 
     return `NOUVELLE DEMANDE DE DEVIS - Nature Raphia
@@ -105,17 +104,18 @@ Pays : ${quote.customer.country || 'Non renseigné'}
 Profil : ${quote.customer.profile === 'grossiste' ? 'Grossiste / B2B' : 'Particulier'}
 Message : ${quote.customer.message || 'Aucun message'}
 
-Produits : ${items || 'Aucun article'}
+Produits :
+${items || 'Aucun article'}
 
 Total estimé : ${total} Ar`;
   }, []);
 
-  const openWhatsAppDirect = useCallback(async (phone: string, message: string) => {
-    const cleanPhone = phone.replace(/\D/g, '');
-    await whatsappService.sendMessage({
-      to: cleanPhone,
-      message,
-    });
+  const openWhatsAppDirect = useCallback((phone: string, message: string) => {
+    if (typeof window !== 'undefined') {
+      const cleanPhone = phone.replace(/\D/g, '');
+      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   }, []);
 
   // Fonction pour envoyer l'email au client UNIQUEMENT
@@ -241,11 +241,11 @@ Total estimé : ${total} Ar`;
         console.error('❌ Échec de l’envoi par email:', emailError);
       }
 
-      // Envoyer la demande sur WhatsApp via l’API
+      // Envoyer la demande sur WhatsApp
       try {
-        await openWhatsAppDirect(WHATSAPP_QUOTE_NUMBER, formatWhatsAppQuoteMessage(newQuote));
+        openWhatsAppDirect(WHATSAPP_QUOTE_NUMBER, formatWhatsAppQuoteMessage(newQuote));
       } catch (whatsappError) {
-        console.error('❌ Échec de l’envoi WhatsApp:', whatsappError);
+        console.error('❌ Échec de l’ouverture WhatsApp:', whatsappError);
       }
 
       console.log('✅ Devis créé avec succès:', newQuote.id);

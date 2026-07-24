@@ -140,10 +140,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
     const url = buildWhatsAppUrl(WHATSAPP_B2B_NUMBER, message);
 
     if (typeof window !== 'undefined') {
-      const popup = window.open(url, '_blank', 'noopener,noreferrer');
-      if (!popup) {
-        window.location.href = url;
-      }
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
