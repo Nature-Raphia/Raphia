@@ -3,7 +3,6 @@ import { MapPin, Phone, Mail, Clock, Send, Building2, MessageCircle } from 'luci
 import { useLang } from '../contexts/LanguageContext';
 import { contactService } from '../services/contactService';
 import { contactEmailService } from '../services/contactEmailService';
-import { whatsappService } from '../services/whatsappService';
 
 const ContactMap: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -129,19 +128,22 @@ Horaires : Lun-Sam 08h30 - 18h00
 Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
   };
 
-  const sendToWhatsApp = async (data: typeof b2bForm) => {
-    const message = formatWhatsAppMessage(data);
-    const cleanPhone = WHATSAPP_B2B_NUMBER.replace(/\D/g, '');
+  // Fonction pour ouvrir WhatsApp avec le message prérempli
+  const buildWhatsAppUrl = (phone: string, message: string) => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    const encodedMessage = encodeURIComponent(message);
+    return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodedMessage}`;
+  };
 
-    try {
-      await whatsappService.sendMessage({
-        to: cleanPhone,
-        message,
-      });
-      setWhatsappSent(true);
-    } catch (error) {
-      console.error('Erreur d’envoi WhatsApp:', error);
-      setWhatsappSent(false);
+  const sendToWhatsApp = (data: typeof b2bForm) => {
+    const message = formatWhatsAppMessage(data);
+    const url = buildWhatsAppUrl(WHATSAPP_B2B_NUMBER, message);
+
+    if (typeof window !== 'undefined') {
+      const popup = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!popup) {
+        window.location.href = url;
+      }
     }
   };
 
@@ -182,8 +184,9 @@ Message du formulaire B2B :
         type: 'b2b'
       });
 
-      // 3. Envoyer sur WhatsApp via l’API
-      await sendToWhatsApp(b2bForm);
+      // 3. Envoyer sur WhatsApp (ouverture dans un nouvel onglet)
+      sendToWhatsApp(b2bForm);
+      setWhatsappSent(true);
 
       setB2bSent(true);
       
@@ -320,8 +323,8 @@ Message du formulaire B2B :
                     'Un email a été envoyé à l\'administrateur.'
                   )}
                 </p>
-                <p className="text-white/40 text-xs mt-3">
-                  Une copie a été envoyée sur WhatsApp (+261 37 99 433 12)
+              /*  <p className="text-white/40 text-xs mt-3">
+                  Une copie a été envoyée sur WhatsApp (+261 34 76 401 16)
                 </p>
               </div>
             ) : (
@@ -376,7 +379,7 @@ Message du formulaire B2B :
                 {/* Indicateur d'envoi WhatsApp */}
                 <div className="flex items-center gap-2 text-white/40 text-xs">
                   <MessageCircle size={12} />
-                  <span>Une copie sera envoyée sur WhatsApp B2B (+261 37 99 433 12)</span>
+                  <span>Une copie sera envoyée sur WhatsApp B2B (+261 34 76 401 16)</span>
                 </div>
 
                 <button type="submit" disabled={loading}
