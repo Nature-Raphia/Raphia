@@ -29,8 +29,12 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
     <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 shadow-lg w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-[#2E4033] flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold font-serif text-xl">NR</span>
+          <div className="w-16 h-16 rounded-full bg-[#2E4033] flex items-center justify-center mx-auto mb-4 overflow-hidden">
+            <img
+              src="/logo.jpeg"
+              alt="Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           <h1 className="font-serif text-2xl font-semibold text-[#2E4033]">Espace Admin</h1>
           <p className="text-sm text-[#2E4033]/50 mt-1">Nature Raphia & Boutique Mahalia</p>
@@ -104,7 +108,7 @@ const DashboardTab: React.FC<{ quotes: QuoteRequest[] }> = ({ quotes }) => {
           .select('*')
           .eq('featured', true)
           .limit(3);
-        
+
         if (error) throw error;
         setFeaturedProducts(data || []);
       } catch (error) {
@@ -172,10 +176,10 @@ const DashboardTab: React.FC<{ quotes: QuoteRequest[] }> = ({ quotes }) => {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
             {featuredProducts.map((p: any) => (
               <div key={p.id} className="flex items-center gap-3 p-2 rounded-xl bg-[#FAF7F2] hover:bg-[#E6DFD3] transition-colors">
-                <img 
-                  src={p.image} 
-                  alt={p.name_fr || p.name || 'Produit'} 
-                  className="w-12 h-12 object-cover rounded-lg" 
+                <img
+                  src={p.image}
+                  alt={p.name_fr || p.name || 'Produit'}
+                  className="w-12 h-12 object-cover rounded-lg"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-[#2E4033] leading-tight truncate">
@@ -208,7 +212,7 @@ const ProductsTab: React.FC = () => {
   const [categoryAddSuccess, setCategoryAddSuccess] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
-  
+
   const [productForm, setProductForm] = useState({
     name: '',
     description: '',
@@ -237,7 +241,7 @@ const ProductsTab: React.FC = () => {
         .from('categories')
         .select('id, name_fr, slug, sort_order')
         .order('sort_order', { ascending: true });
-      
+
       if (error) throw error;
       if (data && data.length > 0) {
         setCategories(data.map((cat: any) => ({ id: cat.id, name: cat.name_fr })));
@@ -267,7 +271,7 @@ const ProductsTab: React.FC = () => {
     loadCategories();
   }, []);
 
-  const filteredProducts = prods.filter(p => 
+  const filteredProducts = prods.filter(p =>
     p.name?.fr?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.name?.en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -276,17 +280,17 @@ const ProductsTab: React.FC = () => {
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
-    
+
     try {
       setAddingCategory(true);
       setCategoryAddSuccess(false);
-      
+
       if (categories.some(cat => cat.name.toLowerCase() === newCategoryName.trim().toLowerCase())) {
         alert('Cette catégorie existe déjà !');
         setAddingCategory(false);
         return;
       }
-      
+
       const { data, error } = await supabase
         .from('categories')
         .insert({
@@ -297,17 +301,17 @@ const ProductsTab: React.FC = () => {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
-      
+
       setCategories(prev => [...prev, { id: data.id, name: data.name_fr }]);
       setProductForm(prev => ({ ...prev, category: data.name_fr }));
       setNewCategoryName('');
       setShowNewCategoryInput(false);
       setCategoryAddSuccess(true);
-      
+
       setTimeout(() => setCategoryAddSuccess(false), 3000);
-      
+
     } catch (error) {
       console.error('Erreur lors de l\'ajout de la catégorie:', error);
       alert('Erreur lors de l\'ajout de la catégorie. Veuillez réessayer.');
@@ -340,7 +344,7 @@ const ProductsTab: React.FC = () => {
 
       if (error) throw error;
 
-      setCategories(prev => prev.map(cat => 
+      setCategories(prev => prev.map(cat =>
         cat.id === id ? { ...cat, name: newName.trim() } : cat
       ));
 
@@ -626,25 +630,25 @@ const ProductsTab: React.FC = () => {
               <input value={productForm.name} onChange={e => setProductForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nom du produit" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
               <textarea value={productForm.description} onChange={e => setProductForm(prev => ({ ...prev, description: e.target.value }))} placeholder="Description" rows={3} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
               <textarea value={productForm.materials} onChange={e => setProductForm(prev => ({ ...prev, materials: e.target.value }))} placeholder="Matériaux" rows={2} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
-              
+
               <div>
                 <label className="text-xs font-medium text-[#2E4033]/50">Prix en Ariary (Ar)</label>
-                <input 
-                  value={productForm.price} 
-                  onChange={e => setProductForm(prev => ({ ...prev, price: e.target.value }))} 
-                  type="number" 
-                  placeholder="Ex: 25000" 
-                  className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033] mt-1" 
+                <input
+                  value={productForm.price}
+                  onChange={e => setProductForm(prev => ({ ...prev, price: e.target.value }))}
+                  type="number"
+                  placeholder="Ex: 25000"
+                  className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033] mt-1"
                 />
               </div>
-              
+
               <input value={productForm.image} onChange={e => setProductForm(prev => ({ ...prev, image: e.target.value }))} placeholder="URL Image ou upload" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
               <input type="file" accept="image/*" onChange={async e => { const file = e.target.files?.[0]; if (file) await handleImageUpload(file); }} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm text-[#2E4033]" />
-              
+
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <select 
-                    value={productForm.category} 
+                  <select
+                    value={productForm.category}
                     onChange={e => {
                       if (e.target.value === 'add_new') {
                         setShowNewCategoryInput(true);
@@ -652,7 +656,7 @@ const ProductsTab: React.FC = () => {
                       } else {
                         setProductForm(prev => ({ ...prev, category: e.target.value }));
                       }
-                    }} 
+                    }}
                     className="flex-1 px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]"
                   >
                     {categories.map(cat => (
@@ -664,7 +668,7 @@ const ProductsTab: React.FC = () => {
                       ➕ Ajouter une nouvelle catégorie
                     </option>
                   </select>
-                  
+
                   <div className="flex gap-1">
                     <button
                       type="button"
@@ -695,7 +699,7 @@ const ProductsTab: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                
+
                 {editingCategoryId && (
                   <div className="flex items-center gap-2">
                     <input
@@ -725,7 +729,7 @@ const ProductsTab: React.FC = () => {
                     </button>
                   </div>
                 )}
-                
+
                 {showNewCategoryInput && (
                   <div className="flex items-center gap-2">
                     <input
@@ -762,7 +766,7 @@ const ProductsTab: React.FC = () => {
                     </button>
                   </div>
                 )}
-                
+
                 {categoryAddSuccess && (
                   <div className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg flex items-center gap-2">
                     <Check size={14} />
@@ -770,9 +774,9 @@ const ProductsTab: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               <input value={productForm.badge} onChange={e => setProductForm(prev => ({ ...prev, badge: e.target.value }))} placeholder="Badge (ex: Nouveau, Épuisé...)" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
-              
+
               <label className="flex items-center gap-2 text-sm text-[#2E4033]">
                 <input type="checkbox" checked={productForm.inStock} onChange={e => setProductForm(prev => ({ ...prev, inStock: e.target.checked }))} />
                 En stock
@@ -800,14 +804,14 @@ const ProductsTab: React.FC = () => {
 };
 
 // Quotes tab - Sans bouton de suppression
-const QuotesTab: React.FC<{ 
-  quotes: QuoteRequest[]; 
+const QuotesTab: React.FC<{
+  quotes: QuoteRequest[];
   updateStatus: (id: string, status: string) => void;
 }> = ({ quotes, updateStatus }) => {
   const [selected, setSelected] = useState<QuoteRequest | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredQuotes = quotes.filter(q => 
+  const filteredQuotes = quotes.filter(q =>
     q.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     q.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     q.id?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -869,7 +873,7 @@ const QuotesTab: React.FC<{
           </div>
           <div className="p-4 border-t border-[#E6DFD3] flex flex-wrap gap-2">
             {['nouveau', 'en_cours', 'traite', 'archive'].map(s => (
-              <button key={s} 
+              <button key={s}
                 onClick={() => { updateStatus(selected.id, s); setSelected({ ...selected, status: s }); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${selected.status === s ? 'bg-[#2E4033] text-white' : 'bg-[#E6DFD3] text-[#2E4033] hover:bg-[#d4cfc8]'}`}>
                 {s === 'nouveau' ? 'Nouveau' : s === 'en_cours' ? 'En cours' : s === 'traite' ? 'Traité' : 'Archiver'}

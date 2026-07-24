@@ -111,8 +111,8 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 <Globe size={12} /> {lang === 'fr' ? 'EN' : 'FR'}
               </button>
               <button onClick={() => { setMobileOpen(false); onAdminClick(); }}
-                className="text-xs text-[#2E4033]/50 border border-[#E6DFD3] rounded-full px-3 py-1.5">
-                Admin ⚙
+                className="text-sm text-[#2E4033] border-2 border-[#2E4033] rounded-full px-6 py-2.5 hover:bg-[#2E4033] hover:text-white transition-all duration-300">
+                ⚙ Admin
               </button>
             </div>
           </div>
