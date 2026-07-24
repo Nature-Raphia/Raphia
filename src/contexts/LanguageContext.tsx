@@ -9,6 +9,10 @@ interface LanguageContextType {
 
 const translations: Record<string, Record<Language, string>> = {
   // Nav
+  'nav.home': { fr: 'Accueil', en: 'Home' },
+  'nav.collections': { fr: 'Collections', en: 'Collections' },
+  'nav.about': { fr: 'À propos', en: 'About' },
+  'nav.b2b': { fr: 'B2B', en: 'B2B' },
   'nav.atelier': { fr: 'L\'Atelier', en: 'The Workshop' },
   'nav.showroom': { fr: 'Le Showroom', en: 'Showroom' },
   'nav.engagements': { fr: 'Engagements', en: 'Commitments' },
@@ -90,7 +94,7 @@ const translations: Record<string, Record<Language, string>> = {
   'contact.label': { fr: 'Localisation & Contact', en: 'Location & Contact' },
   'contact.title': { fr: 'Trouvez-nous à Antsirabe.', en: 'Find us in Antsirabe.' },
   'contact.address': { fr: 'Adresse', en: 'Address' },
-  'contact.address.value': { fr: 'Rue de l\'Indépendance, Antsirabe 110, Madagascar', en: 'Rue de l\'Indépendance, Antsirabe 110, Madagascar' },
+  'contact.address.value': { fr: 'Route d\'Ambositra, en face Hôtel Royal Palace, Antsirabe Afovoany, Madagascar 110', en: 'Route d\'Ambositra, opposite Hôtel Royal Palace, Antsirabe Afovoany, Madagascar 110' },
   'contact.hours': { fr: 'Horaires', en: 'Opening Hours' },
   'contact.hours.value': { fr: 'Lun–Sam : 08h30–18h00 | Dimanche : Fermé', en: 'Mon–Sat: 08:30–18:00 | Sunday: Closed' },
   'contact.phone': { fr: 'Téléphones', en: 'Phones' },

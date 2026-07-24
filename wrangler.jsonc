@@ -6,9 +6,10 @@
   "compatibility_flags": [
     "nodejs_compat"
   ]
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
+  "vars": {
+    "WHATSAPP_API_VERSION": "v20.0",
+    "WHATSAPP_API_URL": "https://graph.facebook.com"
+  },
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",

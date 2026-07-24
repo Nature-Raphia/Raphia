@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import emailjs from '@emailjs/browser';
 import { CartItem, Product, QuoteRequest } from '../types';
+import { contactEmailService } from '../services/contactEmailService';
+import { whatsappService } from '../services/whatsappService';
 
 interface CartContextType {
   items: CartItem[];
@@ -22,6 +24,7 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const WHATSAPP_QUOTE_NUMBER = '261347640116';
 
 // Persist quotes in localStorage
 const loadQuotes = (): QuoteRequest[] => {
@@ -88,6 +91,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
               import.meta.env.VITE_EMAILJS_TEMPLATE_ID && 
               import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
   };
+
+  const formatWhatsAppQuoteMessage = useCallback((quote: QuoteRequest) => {
+    const items = quote.items.map(item => `${item.product.name.fr} x${item.quantity}`).join(', ');
+    const total = (quote.totalEstimate || 0).toLocaleString();
+
+    return `NOUVELLE DEMANDE DE DEVIS - Nature Raphia
+
+Nom : ${quote.customer.name}
+Email : ${quote.customer.email}
+Téléphone : ${quote.customer.phone || 'Non renseigné'}
+Pays : ${quote.customer.country || 'Non renseigné'}
+Profil : ${quote.customer.profile === 'grossiste' ? 'Grossiste / B2B' : 'Particulier'}
+Message : ${quote.customer.message || 'Aucun message'}
+
+Produits : ${items || 'Aucun article'}
+
+Total estimé : ${total} Ar`;
+  }, []);
+
+  const openWhatsAppDirect = useCallback(async (phone: string, message: string) => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    await whatsappService.sendMessage({
+      to: cleanPhone,
+      message,
+    });
+  }, []);
 
   // Fonction pour envoyer l'email au client UNIQUEMENT
   const sendClientEmail = useCallback(async (quote: QuoteRequest) => {
@@ -164,6 +193,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
 
       console.log('✅ Email envoyé avec succès à', quote.customer.email);
+
+      await contactEmailService.sendContactEmail({
+        name: quote.customer.name,
+        email: quote.customer.email,
+        phone: quote.customer.phone || '',
+        subject: `Nouvelle demande de devis - ${quote.id}`,
+        message: `Nouvelle demande de devis Nature Raphia\n\nClient: ${quote.customer.name}\nEmail: ${quote.customer.email}\nTéléphone: ${quote.customer.phone || 'Non renseigné'}\nPays: ${quote.customer.country || 'Non renseigné'}\nProfil: ${quote.customer.profile === 'grossiste' ? 'Grossiste / B2B' : 'Particulier'}\n\nMessage: ${quote.customer.message || 'Aucun message'}\n\nProduits:\n${quote.items.map(item => `- ${item.product.name.fr} x${item.quantity}`).join('\n')}\n\nTotal estimé: ${(quote.totalEstimate || 0).toLocaleString()} Ar`,
+        type: 'contact'
+      });
+
       return true;
 
     } catch (error) {
@@ -195,8 +234,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updated;
       });
 
-      // Envoyer l'email UNIQUEMENT au client
-      await sendClientEmail(newQuote);
+      // Envoyer l'email au client et une notification admin
+      try {
+        await sendClientEmail(newQuote);
+      } catch (emailError) {
+        console.error('❌ Échec de l’envoi par email:', emailError);
+      }
+
+      // Envoyer la demande sur WhatsApp via l’API
+      try {
+        await openWhatsAppDirect(WHATSAPP_QUOTE_NUMBER, formatWhatsAppQuoteMessage(newQuote));
+      } catch (whatsappError) {
+        console.error('❌ Échec de l’envoi WhatsApp:', whatsappError);
+      }
 
       console.log('✅ Devis créé avec succès:', newQuote.id);
       return newQuote;
