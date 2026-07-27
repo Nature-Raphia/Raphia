@@ -105,13 +105,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-          <span className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full px-5 py-2 mb-8">
-            <Building2 size={14} className="text-[#C97A53]" />
-            <span className="text-white/80 text-xs tracking-[0.15em] uppercase font-light">
-              {t('nav.b2b')}
-            </span>
-            <span className="w-px h-4 bg-white/20" />
-          </span>
+         
 
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.1] mb-6">
             {t('b2b.hero.title')}

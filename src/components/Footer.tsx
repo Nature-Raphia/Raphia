@@ -1,14 +1,10 @@
 import React from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   const { t } = useLang();
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <footer className="bg-[#2E4033] text-white">
@@ -65,18 +61,19 @@ const Footer: React.FC = () => {
             <h4 className="font-semibold text-sm uppercase tracking-widest mb-4 text-[#E6DFD3]">Navigation</h4>
             <ul className="space-y-2">
               {[
-                { label: t('nav.atelier'), id: 'atelier' },
-                { label: t('nav.showroom'), id: 'showroom' },
-                { label: t('nav.engagements'), id: 'engagements' },
-                { label: t('nav.contact'), id: 'contact' },
+                { label: t('nav.home'), to: '/' },
+                { label: t('nav.collections'), to: '/showroom' },
+                { label: t('nav.about'), to: '/atelier' },
+                { label: t('nav.b2b'), to: '/b2b' },
+                { label: t('nav.contact'), to: '/contact' },
               ].map(link => (
-                <li key={link.id}>
-                  <button
-                    onClick={() => scrollTo(link.id)}
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
                     className="text-sm text-white/60 hover:text-[#C97A53] transition-colors"
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
