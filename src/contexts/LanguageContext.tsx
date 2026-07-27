@@ -21,10 +21,10 @@ const translations: Record<string, Record<Language, string>> = {
 
   // Hero
   'hero.location': { fr: 'Antsirabe · Madagascar', en: 'Antsirabe · Madagascar' },
-  'hero.title': { fr: 'De la fibre sauvage\nà l\'accessoire\nd\'exception.', en: 'From wild fibre\nto an exceptional\naccessory.' },
+  'hero.title': { fr: 'De la fibre sauvage à l\'accessoire d\'exception.', en: 'From wild fibre to an exceptional accessory.' },
   'hero.subtitle': { fr: 'Depuis les hautes terres d\'Antsirabe, nos artisanes tissent chaque pièce à la main, tressant héritage, patience et beauté brute dans une signature 100% Madagascar.', en: 'From the highlands of Antsirabe, our artisans weave each piece by hand, braiding heritage, patience and raw beauty into a 100% Madagascar signature.' },
   'hero.cta.collection': { fr: 'Découvrir la collection', en: 'Discover the collection' },
-  'hero.cta.atelier': { fr: 'Voir l\'Atelier', en: 'See the Workshop' },
+  'hero.cta.atelier': { fr: 'Notre Histoire', en: 'Our Story' },
   'hero.scroll': { fr: 'Faire défiler', en: 'Scroll down' },
 
   // Atelier
