@@ -58,7 +58,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                   >
                     <Icon size={14} />
                     {link.label}
-                    {link.isB2B && <span className="ml-1 text-[10px] uppercase tracking-[0.2em] bg-[#C97A53]/10 px-2 py-0.5 rounded-full">Pro</span>}
+                   
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#C97A53] transition-all group-hover:w-full" />
                   </Link>
                 );
