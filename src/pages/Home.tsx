@@ -15,7 +15,7 @@ const Home: React.FC = () => {
     <div>
       <Hero />
 
-      <section className="text-center py-8 md:py-12 bg-[#FAF7F2]">
+      <section className="text-center py-2 md:py-12 bg-[#FFF]">
         <div className="max-w-4xl mx-auto px-4">
           <div className="w-16 h-0.5 bg-[#C97A53] mx-auto mb-4" />
           <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-[#2E4033]">
