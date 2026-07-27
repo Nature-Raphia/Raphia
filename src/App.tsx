@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { CartProvider } from './contexts/CartContext';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Atelier from './components/Atelier';
-import Showroom from './components/Showroom';
-import RSE from './components/RSE';
-import Contact from './components/Contact';
+import Home from './pages/Home';
+import ShowroomPage from './pages/Showroom';
+import AtelierPage from './pages/Atelier';
+import B2B from './pages/B2B';
+import ContactPage from './pages/ContactPage';
 import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -19,11 +20,13 @@ const AppContent: React.FC = () => {
     <>
       <Navbar onAdminClick={() => setShowAdmin(true)} />
       <main>
-        <Hero />
-        <Showroom />
-        <Atelier />
-        <RSE />
-        <Contact />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/showroom" element={<ShowroomPage />} />
+          <Route path="/atelier" element={<AtelierPage />} />
+          <Route path="/b2b" element={<B2B />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Routes>
       </main>
       <Footer />
       <CartSidebar />
@@ -33,10 +36,21 @@ const AppContent: React.FC = () => {
   );
 };
 
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 const App: React.FC = () => (
   <LanguageProvider>
     <CartProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppContent />
+        <ScrollToTop />
+      </BrowserRouter>
     </CartProvider>
   </LanguageProvider>
 );

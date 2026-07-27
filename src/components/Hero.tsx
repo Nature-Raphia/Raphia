@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, ArrowRight, Leaf, Award, Handshake } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
   const { t } = useLang();
@@ -10,11 +11,6 @@ const Hero: React.FC = () => {
     const timer = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
@@ -69,54 +65,40 @@ const Hero: React.FC = () => {
 
           {/* Boutons CTA */}
           <div className={`flex flex-wrap items-center gap-4 transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <button 
-              onClick={() => scrollTo('showroom')}
+            <Link
+              to="/showroom"
               className="group flex items-center gap-3 bg-[#C97A53] hover:bg-[#a8623e] text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#C97A53]/40"
             >
               {t('hero.cta.collection')}
               <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
-            <button 
-              onClick={() => scrollTo('atelier')}
+            </Link>
+            <Link
+              to="/atelier"
               className="group flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300"
             >
               {t('hero.cta.atelier')}
-            </button>
+            </Link>
           </div>
 
         </div>
       </div>
 
       {/* Indicateur de scroll */}
-      <button 
-        onClick={() => scrollTo('atelier')}
+      <Link
+        to="/showroom"
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/40 hover:text-white/70 transition-colors duration-300 z-10 group"
       >
         <span className="text-[10px] uppercase tracking-[0.2em] font-light">{t('hero.scroll')}</span>
         <ChevronDown size={18} className="animate-bounce group-hover:translate-y-1 transition-transform" />
-      </button>
+      </Link>
 
       {/* Carte produit flottante */}
-      <div className={`hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 z-10 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16'}`}>
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-56 shadow-2xl shadow-black/20 hover:bg-white/10 transition-all duration-300 hover:scale-[1.02]">
-          <div className="relative overflow-hidden rounded-xl mb-4">
-            <img
-              src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&q=80"
-              alt="Cabas Solstice"
-              className="w-full h-44 object-cover transition-transform duration-500 hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-          </div>
-          <div className="text-white">
-            <div className="text-[10px] text-white/40 uppercase tracking-[0.15em] mb-1">Pièce signature</div>
-            <div className="font-serif text-sm font-light">Cabas Solstice</div>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-[#C97A53] font-light text-sm">85 €</span>
-              <span className="text-[10px] text-white/30 uppercase tracking-widest border border-white/10 rounded-full px-3 py-0.5">Raphia</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Link
+        to="/showroom"
+        className={`hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 z-10 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16'}`}
+      >
+       
+      </Link>
     </section>
   );
 };

@@ -29,119 +29,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Image Container - Style Airbnb */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#F5F5F5]">
-        <div className="aspect-square w-full">
-          <img
-            src={product.image}
-            alt={product.name[lang]}
-            className={`w-full h-full object-cover transition-transform duration-700 ${
-              hover ? 'scale-105' : 'scale-100'
-            }`}
-            loading="lazy"
-          />
-        </div>
+  
 
-        {/* Overlay gradient subtil */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent transition-opacity duration-500 ${
-          hover ? 'opacity-100' : 'opacity-0'
-        }`} />
-
-        {/* Badge - Style Airbnb */}
-        {product.badge && (
-          <div className="absolute top-3 left-3 z-10">
-            <span className={`text-[10px] font-medium px-3 py-1 rounded-full ${
-              product.badge.fr === 'Épuisé' 
-                ? 'bg-black/60 text-white/80 backdrop-blur-sm' 
-                : 'bg-white/90 text-[#2E4033] shadow-sm backdrop-blur-sm'
-            }`}>
-              {product.badge[lang]}
-            </span>
-          </div>
-        )}
-
-        {/* Like button - Style Airbnb */}
-        <button 
-          onClick={() => setLiked(!liked)}
-          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-sm hover:shadow-md"
-        >
-          <Heart 
-            size={18} 
-            className={`transition-colors duration-300 ${liked ? 'fill-red-500 text-red-500' : 'text-[#2E4033]'}`}
-          />
-        </button>
-
-        {/* Price badge - Style Airbnb */}
-        <div className={`absolute bottom-3 left-3 right-3 z-10 transition-all duration-400 ${
-          hover ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}>
-          <button
-            onClick={() => addItem(product)}
-            className={`w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 ${
-              justAdded
-                ? 'bg-[#2E4033] text-white shadow-lg'
-                : 'bg-white text-[#2E4033] hover:bg-[#C97A53] hover:text-white shadow-lg hover:shadow-[#C97A53]/20'
-            }`}
-          >
-            {justAdded ? (
-              <><Check size={16} /> {t('cart.added')}</>
-            ) : (
-              <><ShoppingBag size={16} /> {t('showroom.add')}</>
-            )}
-          </button>
-        </div>
-
-        {!product.inStock && (
-          <div className="absolute bottom-3 left-3 right-3 z-10">
-            <div className="w-full py-2.5 rounded-xl bg-black/50 backdrop-blur-sm text-white/80 text-sm text-center font-medium">
-              {t('showroom.outofstock')}
-            </div>
-          </div>
-        )}
-
-        {/* Quick view button - Style Airbnb */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-400 ${
-          hover ? 'opacity-100' : 'opacity-0'
-        }`}>
-     
-        </div>
-      </div>
-
-      {/* Info - Style Airbnb */}
-      <div className="mt-2.5 space-y-1">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-medium text-[#2E4033] leading-tight truncate">
-              {product.name[lang]}
-            </h3>
-            <p className="text-xs text-[#2E4033]/50 truncate">
-              {product.materials?.[lang] || ''}
-            </p>
-          </div>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Star size={14} className="fill-[#C97A53] text-[#C97A53]" />
-            <span className="text-xs font-medium text-[#2E4033]">4.8</span>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-[#C97A53]">
-            {product.price.toLocaleString()} Ar
-          </span>
-          {product.inStock && (
-            <button
-              onClick={() => addItem(product)}
-              className={`text-xs font-medium transition-colors ${
-                justAdded 
-                  ? 'text-[#2E4033]' 
-                  : 'text-[#C97A53] hover:text-[#a8623e]'
-              }`}
-            >
-              {justAdded ? '✓ Ajouté' : 'Ajouter'}
-            </button>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
@@ -227,55 +116,9 @@ const Showroom: React.FC = () => {
     <section id="showroom" className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header - Style Airbnb */}
-        <div ref={ref} className={`mb-10 transition-all duration-700 ${
-          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-xs font-medium text-[#C97A53] uppercase tracking-widest">
-                {t('showroom.label')}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-[#2E4033] mt-1">
-                {t('showroom.title')}
-              </h2>
-              <p className="text-[#2E4033]/60 text-sm mt-1">
-                {t('showroom.subtitle')}
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <span className="text-sm text-[#2E4033]/40">
-                {filtered.length} produits disponibles
-              </span>
-            </div>
-          </div>
-        </div>
+  
 
-        {/* Filters - Style Airbnb avec scroll horizontal */}
-        <div className="flex flex-nowrap gap-2 overflow-x-auto pb-4 mb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-          <button
-            onClick={() => { setActiveCategory('all'); setShowAll(false); }}
-            className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-              activeCategory === 'all'
-                ? 'bg-[#2E4033] text-white shadow-md'
-                : 'bg-white text-[#2E4033] hover:bg-[#F5F5F5] border border-[#E6DFD3]'
-            }`}
-          >
-            Tous
-          </button>
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => { setActiveCategory(cat.id); setShowAll(false); }}
-              className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${
-                activeCategory === cat.id
-                  ? 'bg-[#2E4033] text-white shadow-md'
-                  : 'bg-white text-[#2E4033] hover:bg-[#F5F5F5] border border-[#E6DFD3]'
-              }`}
-            >
-              {lang === 'fr' ? cat.name_fr : cat.name_en}
-            </button>
-          ))}
-        </div>
+ 
 
         {/* Products Grid - Style Airbnb 4 colonnes */}
         {loading ? (

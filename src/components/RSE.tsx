@@ -200,76 +200,7 @@ const RSE: React.FC = () => {
           </div>
         </div>
 
-        {/* Testimonials - Design plus épuré et élégant */}
-        <div>
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <span className="w-8 h-px bg-[#C97A53]" />
-              <span className="text-xs font-light text-[#C97A53] uppercase tracking-[0.2em]">
-                {t('testimonials.label') || 'Témoignages'}
-              </span>
-              <span className="w-8 h-px bg-[#C97A53]" />
-            </div>
-            <h3 className="font-serif text-3xl font-light text-[#2E4033]">
-              {t('testimonials.title')}
-            </h3>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                quote: { fr: '"Une qualité de tissage rare et des finitions qui subliment chaque saison de notre concept-store."', en: '"A rare weaving quality and finishes that elevate every season at our concept store."' },
-                author: 'Camille R.',
-                location: 'Concept-store, Paris',
-                color: '#C97A53'
-              },
-              {
-                quote: { fr: '"Nature Raphia est devenu un partenaire essentiel de notre sélection été."', en: '"Nature Raphia has become an essential partner for our summer selection."' },
-                author: 'Sofia L.',
-                location: 'Boutique d\'hôtel, Milan',
-                color: '#2E4033'
-              },
-              {
-                quote: { fr: '"Nos clientes tombent amoureuses des chapeaux dès qu\'elles les touchent."', en: '"Our customers fall in love with the hats the moment they touch them."' },
-                author: 'Elena M.',
-                location: 'E-shop mode, Barcelone',
-                color: '#C97A53'
-              },
-              {
-                quote: { fr: '"Un travail éthique et une histoire humaine forte — exactement ce que nos clients recherchent."', en: '"Ethical work and a strong human story — exactly what our customers seek."' },
-                author: 'Marc D.',
-                location: 'Boutique déco, Bruxelles',
-                color: '#2E4033'
-              },
-            ].map((testimonial, i) => (
-              <div
-                key={i}
-                className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 relative overflow-hidden"
-              >
-                {/* Accent color line */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl transition-all duration-500 group-hover:h-1.5"
-                  style={{ backgroundColor: testimonial.color }}
-                />
-
-                <div className="pt-4">
-                  <Quote size={20} className="text-[#C97A53]/30 mb-3" strokeWidth={1.5} />
-                  <p className="text-sm text-[#2E4033]/70 leading-relaxed italic mb-4">
-                    {testimonial.quote.fr}
-                  </p>
-                  <div className="border-t border-[#E6DFD3] pt-3">
-                    <div className="font-serif font-medium text-[#2E4033] text-sm">
-                      {testimonial.author}
-                    </div>
-                    <div className="text-xs text-[#2E4033]/40 mt-0.5">
-                      {testimonial.location}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+     
       </div>
     </section>
   );

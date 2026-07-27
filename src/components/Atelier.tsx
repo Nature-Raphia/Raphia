@@ -163,7 +163,7 @@ const Atelier: React.FC = () => {
                   {t('atelier.label')}
                 </span>
               </div>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2E4033] mb-4 leading-tight">
+              <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-[#2E4033] mb-4 leading-tight">
                 {t('atelier.title')}
               </h2>
               <p className="text-[#2E4033]/60 text-sm lg:text-base max-w-xl">
@@ -194,7 +194,7 @@ const Atelier: React.FC = () => {
         <div className="mt-20">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-[#2E4033]">Galerie</h3>
+              <h3 className="font-serif text-xl font-semibold text-[#2E4033]">Galerie</h3>
               <p className="text-sm text-[#2E4033]/50">Découvrez notre processus artisanal</p>
             </div>
             <button className="text-sm font-medium text-[#C97A53] hover:text-[#a8623e] transition-colors">
@@ -225,23 +225,7 @@ const Atelier: React.FC = () => {
         </div>
 
         {/* Call to action - Style Airbnb */}
-        <div className="mt-16 bg-[#2E4033] rounded-2xl p-8 md:p-12 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#C97A53]/10 rounded-full blur-3xl" />
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold text-white">
-                Prêt à découvrir notre artisanat ?
-              </h3>
-              <p className="text-white/70 text-sm mt-1">
-                Plongez dans l'univers de la création artisanale
-              </p>
-            </div>
-            <button className="flex items-center gap-2 px-6 py-3 bg-[#C97A53] hover:bg-[#a8623e] text-white rounded-full font-medium transition-colors shadow-lg shadow-[#C97A53]/20">
-              <Play size={18} />
-              Découvrir l'atelier
-            </button>
-          </div>
-        </div>
+    
       </div>
     </section>
   );
