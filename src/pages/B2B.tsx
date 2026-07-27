@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Building2, Truck, Users, BadgeCheck, MessageCircle, Phone } from 'lucide-react';
+import { ArrowRight, Building2, Truck, Users, BadgeCheck, MessageCircle, Phone, FolderOpen } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { contactService } from '../services/contactService';
 import { contactEmailService } from '../services/contactEmailService';
@@ -31,7 +31,7 @@ Contact : ${data.contact}
 Email : ${data.email}
 Pays : ${data.country}
 Type de projet : ${data.projectType}
-Volume estimé : ${data.volume}
+
 Message : ${data.message || 'Aucun message'}
 
 Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
@@ -64,7 +64,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
         email: form.email,
         phone: '',
         subject: `Demande Partenariat B2B - ${form.structure}`,
-        message: `Demande de partenariat B2B :\nStructure : ${form.structure}\nContact : ${form.contact}\nEmail : ${form.email}\nPays : ${form.country}\nType de projet : ${form.projectType}\nVolume estimé : ${form.volume}\nMessage : ${form.message || 'Aucun message'}`,
+        message: `Demande de partenariat B2B :\nStructure : ${form.structure}\nContact : ${form.contact}\nEmail : ${form.email}\nPays : ${form.country}\nType de projet : ${form.projectType}\nMessage : ${form.message || 'Aucun message'}`,
         type: 'b2b'
       });
 
@@ -93,18 +93,9 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
 
   return (
     <div className="relative">
-      {/* Hero Section with blur bg */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=1920&q=85"
-            alt="B2B Hero"
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1A261E]/70 via-[#2E4033]/40 to-[#2E4033]/10 backdrop-blur-sm" />
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
+      {/* Hero Section */}
+      <section className="relative bg-[#2E4033] py-24 flex items-center overflow-hidden">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 text-center">
          
 
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.1] mb-6">
@@ -158,7 +149,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
       </section>
 
       {/* Partnership Form */}
-      <section className="py-24 bg-[#2E4033]">
+      <section className="py-24 bg-[#2E4033]/90 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 text-xs font-medium text-[#C97A53] uppercase tracking-widest mb-4">
@@ -263,18 +254,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
                     placeholder={t('b2b.form.ph.projectType')}
                   />
                 </div>
-                <div>
-                  <label className="block text-white/70 text-xs font-medium uppercase tracking-widest mb-2">
-                    {t('b2b.form.volume')}
-                  </label>
-                  <input
-                    type="text"
-                    value={form.volume}
-                    onChange={e => setForm(p => ({ ...p, volume: e.target.value }))}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-[#C97A53] transition-colors"
-                    placeholder={t('b2b.form.ph.volume')}
-                  />
-                </div>
+           
               </div>
 
               <div>
@@ -299,7 +279,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
                   <span className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
                 ) : (
                   <>
-                    <MessageCircle size={18} />
+                    <FolderOpen size={18} />
                     {t('b2b.form.submit')}
                   </>
                 )}
@@ -309,29 +289,7 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
         </div>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="py-16 bg-[#FAF7F2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a
-              href={`https://wa.me/${WHATSAPP_B2B_NUMBER}?text=Bonjour%2C%20je%20souhaite%20discuter%20d%E2%80%99un%20partenariat%20B2B%20avec%20Nature%20Raphia.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300"
-            >
-              <MessageCircle size={18} />
-              {t('b2b.cta.whatsapp')}
-            </a>
-            <a
-              href="tel:+261347640116"
-              className="flex items-center gap-2 border border-[#2E4033]/20 hover:bg-[#2E4033] text-[#2E4033] hover:text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300"
-            >
-              <Phone size={18} />
-              +261 34 76 401 16
-            </a>
-          </div>
-        </div>
-      </section>
+ 
     </div>
   );
 };
