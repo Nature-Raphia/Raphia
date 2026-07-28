@@ -13,9 +13,11 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#C97A53] flex items-center justify-center">
-                <span className="text-white font-bold font-serif text-sm">NR</span>
-              </div>
+              <img
+                src="/logo.jpeg"
+                alt="Nature Raphia & Mahalia"
+                className="w-10 h-10 rounded-full object-cover"
+              />
               <div>
                 <div className="font-serif font-semibold text-lg">Nature Raphia</div>
                 <div className="text-[#C97A53] text-xs tracking-widest uppercase">& Boutique Mahalia</div>
