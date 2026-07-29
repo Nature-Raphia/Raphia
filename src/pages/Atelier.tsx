@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import Atelier from '../components/Atelier';
 import { useLang } from '../contexts/LanguageContext';
+import productCabasSolstice from '../assets/images/product-cabas-solstice.webp';
 
 const AtelierPage: React.FC = () => {
   const { lang, t } = useLang();
@@ -104,7 +105,7 @@ const AtelierPage: React.FC = () => {
       <div className="relative order-2 lg:order-1">
         <div className="relative rounded-2xl overflow-hidden">
           <img
-            src="/src/assets/images/atelier-crochet.jpg"
+            src={productCabasSolstice}
             alt="Artisanat Mahalia - Atelier"
             className="w-full h-auto object-cover aspect-[4/3] rounded-2xl"
             loading="lazy"
