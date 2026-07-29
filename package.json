@@ -16,7 +16,7 @@
     "@types/react-dom": "^19.2.3",
     "hono": "^4.12.31",
     "leaflet": "^1.9.4",
-    "lucide-react": "^1.26.0",
+    "lucide-react": "^1.27.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.1"
