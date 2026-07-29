@@ -161,12 +161,7 @@ const RSE: React.FC = () => {
 
           {/* Text avec plus de caractère */}
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-px bg-[#C97A53]" />
-              <span className="text-xs font-light text-[#C97A53] uppercase tracking-[0.2em]">
-                {t('rse.women.label') || 'Artisanat'}
-              </span>
-            </div>
+          
 
             <h3 className="font-serif text-3xl md:text-4xl font-light text-[#2E4033] mb-4 leading-tight">
               {t('rse.women.title')}
