@@ -142,7 +142,7 @@ const Contact: React.FC = () => {
                 className="flex items-center justify-center gap-2 py-3.5 bg-[#25D366] hover:bg-[#1ebe5b] text-white rounded-2xl font-medium transition-colors shadow-md shadow-[#25D366]/30 text-sm"
               >
                 <MessageCircle size={18} />
-                WhatsApp Client
+                WhatsApp Particulier
               </a>
               <a
                 href={`https://wa.me/${WHATSAPP_OFFICIAL_NUMBER}?text=Bonjour%2C%20je%20souhaite%20discuter%20d%E2%80%99un%20partenariat%20B2B%20avec%20Nature%20Raphia.`}

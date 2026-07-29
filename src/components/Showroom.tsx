@@ -96,9 +96,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
       {/* INFORMATIONS PRODUIT */}
       <div className="px-1 sm:px-0">
-        <h3 className="mt-4 sm:mt-6 font-serif text-xl sm:text-2xl text-[#2E4033]">
-          {product.name[lang]}
-        </h3>
+        <div className="mt-4 sm:mt-6 flex items-start justify-between gap-3">
+          <h3 className="font-serif text-xl sm:text-2xl text-[#2E4033] flex-1">
+            {product.name[lang]}
+          </h3>
+          {product.inStock && (
+            <button
+              onClick={() => addItem(product)}
+              className={`shrink-0 rounded-md w-8 h-8 flex items-center justify-center border transition-all duration-300 ${
+                justAdded
+                  ? 'bg-[#2E4033] border-[#2E4033] text-white'
+                  : 'border-[#2E4033]/20 text-[#2E4033] hover:border-[#C97A53] hover:text-[#C97A53]'
+              }`}
+            >
+              {justAdded ? (
+                <Check size={14} />
+              ) : (
+                <span className="text-lg leading-none">+</span>
+              )}
+            </button>
+          )}
+        </div>
 
         <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-relaxed text-[#2E4033]/70">
           {product.description[lang]}
