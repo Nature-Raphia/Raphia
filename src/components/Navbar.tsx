@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, Globe, Phone, Users, Home, BookOpen, FileText, MapPin } from 'lucide-react';
+import { Menu, X, Globe, Phone, Users, Home, BookOpen, FileText, MapPin, ShoppingBag } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
@@ -41,8 +41,8 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <div className="hidden sm:flex flex-col leading-tight">
-                <span className="font-serif text-sm font-semibold text-[#2E4033]">Nature Raphia</span>
-                <span className="text-[10px] text-[#C97A53] tracking-widest uppercase font-medium">& Boutique Mahalia</span>
+                <span className=" text-sm  text-[#2E4033]">Nature Raphia</span>
+                <span className="text-[10px] text-[#C97A53] tracking-widest uppercase ">& Boutique Mahalia</span>
               </div>
             </Link>
 
@@ -53,12 +53,12 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className={`text-sm font-medium transition-colors relative group flex items-center gap-1.5 ${link.isB2B ? 'text-[#C97A53] hover:text-[#2E4033]' : 'text-[#2E4033] hover:text-[#C97A53]'}`}
+                    className={`text-sm  transition-colors relative group flex items-center gap-1.5 ${link.isB2B ? 'text-[#C97A53] hover:text-[#2E4033]' : 'text-[#2E4033] hover:text-[#C97A53]'}`}
                     onClick={() => setMobileOpen(false)}
                   >
                     <Icon size={14} />
                     {link.label}
-                   
+                
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#C97A53] transition-all group-hover:w-full" />
                   </Link>
                 );
@@ -79,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 className="hidden sm:flex items-center gap-1 text-xs font-medium text-[#2E4033] hover:text-[#C97A53] transition-colors border border-[#E6DFD3] rounded-full px-3 py-1.5"
               >
                 <Globe size={12} />
-                <span>{lang.toUpperCase()}</span>
+                <span>{lang === 'fr' ? 'EN' : 'FR'}</span>
               </button>
 
               <button
@@ -127,11 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                     <span className="font-medium">{link.label}</span>
                     <p className="text-[10px] text-gray-500">{link.description}</p>
                   </div>
-                  {link.isB2B && (
-                    <span className="ml-auto text-[10px] bg-[#C97A53]/10 text-[#C97A53] px-2 py-0.5 rounded-full">
-                      PRO
-                    </span>
-                  )}
+                
                 </Link>
               );
             })}

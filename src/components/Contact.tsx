@@ -108,7 +108,7 @@ const Contact: React.FC = () => {
             {t('contact.label')}
             <span className="w-8 h-px bg-[#C97A53]" />
           </span>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-[#2E4033] mb-4">
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl  text-[#2E4033] mb-4">
             {t('contact.title')}
           </h2>
         </div>

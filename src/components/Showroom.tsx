@@ -50,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* BADGE */}
         {product.badge && (
           <div className="absolute left-3 sm:left-4 top-3 sm:top-4 z-10">
-            <span className="rounded-full bg-[#2E4033]/80 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[10px] font-medium text-white backdrop-blur-sm">
+            <span className="rounded-full bg-[#2E4033]/80 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[10px]  text-white backdrop-blur-sm">
               {product.badge[lang]}
             </span>
           </div>
