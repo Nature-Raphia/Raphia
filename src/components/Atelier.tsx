@@ -1,182 +1,118 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { useLang } from '../contexts/LanguageContext';
-import { ArrowRight, Award, Clock, Leaf, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react'
+import { useLang } from '../contexts/LanguageContext'
+import recolte from '../assets/images/atelier-recolte.jpg'
+import tri from '../assets/images/atelier-tri.jpg'
+import teinture from '../assets/images/atelier-teinture.jpg'
+import crochet from '../assets/images/atelier-crochet.jpg'
 
-const steps = [
-  {
-    number: '01',
-    titleKey: 'story.step1.title',
-    descKey: 'story.step1.desc',
-    image: 'https://earthy-artisanal-boutique.lovable.app/assets/atelier-hands-BzOj_YfA.jpg',
-  },
-  {
-    number: '02',
-    titleKey: 'story.step2.title',
-    descKey: 'story.step2.desc',
-    image: 'https://earthy-artisanal-boutique.lovable.app/assets/dyed-raphia-BEQA-rXp.jpg',
-  },
-  {
-    number: '03',
-    titleKey: 'story.step3.title',
-    descKey: 'story.step3.desc',
-    image: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/a545435e-6266-4855-91d9-18152e530bbc/atelier-collage.jpg',
-  },
-  {
-    number: '04',
-    titleKey: 'story.step4.title',
-    descKey: 'story.step4.desc',
-    image: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/9a27bdf5-a1ac-47f5-896d-527ec44fffda/showroom-bags.jpg',
-  },
-];
+const IMAGES = [recolte, tri, teinture, crochet]
 
-const impactStats = [
-  { icon: Users, number: '40+', labelKey: 'story.stat1' },
-  { icon: Leaf, number: '100%', labelKey: 'story.stat2' },
-  { icon: Clock, number: '0', labelKey: 'story.stat3' },
-  { icon: Award, number: '12', labelKey: 'story.stat4' },
-];
-
-const StepCard: React.FC<{ step: typeof steps[0]; index: number }> = ({ step, index }) => {
-  const { t } = useLang();
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setVisible(true); obs.disconnect(); }
-    }, { threshold: 0.2 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
+export default function Atelier() {
+  const { t } = useLang()
+  const [active, setActive] = useState(0)
+  const steps = [
+    {
+      title: t('atelier.step1.title'),
+      text: t('atelier.step1.desc'),
+    },
+    {
+      title: t('atelier.step2.title'),
+      text: t('atelier.step2.desc'),
+    },
+    {
+      title: t('atelier.step3.title'),
+      text: t('atelier.step3.desc'),
+    },
+    {
+      title: t('atelier.step4.title'),
+      text: t('atelier.step4.desc'),
+    },
+  ]
 
   return (
-    <div
-      ref={ref}
-      className={`flex flex-col md:flex-row items-center gap-8 md:gap-12 transition-all duration-700 ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-      }`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
-      {/* Image */}
-      <div className="flex-shrink-0 w-full md:w-1/2 lg:w-5/12">
-        <div className="relative rounded-2xl overflow-hidden shadow-lg">
-          <div className="aspect-[4/3] w-full">
-            <img
-              src={step.image}
-              alt={t(step.titleKey)}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          {/* Numbered badge */}
-          <div className="absolute top-4 left-4">
-            <span className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm text-[#2E4033] px-4 py-1.5 rounded-full text-xs font-medium shadow-lg">
-              {step.number}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 flex flex-col justify-center space-y-4">
-        <h3 className="font-serif text-2xl lg:text-3xl font-semibold text-[#2E4033] leading-tight">
-          {t(step.titleKey)}
-        </h3>
-        <p className="text-[#2E4033]/60 leading-relaxed text-sm lg:text-base max-w-lg">
-          {t(step.descKey)}
-        </p>
-      </div>
-    </div>
-  );
-};
-
-const Atelier: React.FC = () => {
-  const { t } = useLang();
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setVisible(true); obs.disconnect(); }
-    }, { threshold: 0.1 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
-  return (
-    <section id="atelier" className="py-16 bg-[#FAF7F2] relative overflow-hidden">
-      {/* Decorative blobs */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#C97A53]/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#2E4033]/5 rounded-full blur-3xl" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-
-        {/* Header */}
-        <div
-          ref={ref}
-          className={`mb-16 transition-all duration-700 ${
-            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
-          <span className="inline-flex items-center gap-2 text-xs font-medium text-[#C97A53] uppercase tracking-widest mb-4">
-            <span className="w-8 h-px bg-[#C97A53]" />
-            Nature Raphia · L'Atelier
-            <span className="w-8 h-px bg-[#C97A53]" />
-          </span>
-          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light text-[#2E4033] mb-6 leading-tight">
-            {t('story.title')}
-          </h2>
-          <p className="text-[#2E4033]/60 text-base lg:text-lg max-w-2xl leading-relaxed mb-8">
-            {t('story.subtitle')}
+    <section id="atelier" className="bg-[var(--color-ivory)] py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-terracotta)]">
+            {t('atelier.eyebrow')}
           </p>
-       
+          <h2 className="mt-3 font-serif text-3xl font-medium text-[var(--color-olive)] sm:text-4xl">
+            {t('atelier.title')}
+          </h2>
+          <p className="mt-4 text-[15px] leading-relaxed text-[var(--color-olive)]/75 sm:text-base">
+            {t('atelier.intro')}
+          </p>
         </div>
 
-        {/* Steps */}
-        <div className="space-y-16 lg:space-y-20">
-          {steps.map((step, i) => (
-            <StepCard key={i} step={step} index={i} />
-          ))}
-        </div>
-
-        {/* Impact Stats */}
-        <div className="mt-20">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 text-xs font-medium text-[#C97A53] uppercase tracking-widest mb-4">
-              <span className="w-8 h-px bg-[#C97A53]" />
-              {t('story.impact.label')}
-              <span className="w-8 h-px bg-[#C97A53]" />
-            </span>
-            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-[#2E4033] mb-4">
-              {t('story.impact.title')}
-            </h2>
+        <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+          {/* Image */}
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl shadow-[var(--color-olive)]/10">
+            {IMAGES.map((img, idx) => (
+              <img
+                key={idx}
+                src={img}
+                alt={steps[idx]?.title}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                  idx === active ? 'opacity-100' : 'opacity-0'
+                }`}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+              />
+            ))}
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-olive)]/50 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 rounded-full bg-[var(--color-ivory)]/90 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--color-olive)]">
+              {t('atelier.stepLabel')} {active + 1} / {steps.length}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {impactStats.map((stat, i) => {
-              const Icon = stat.icon;
+          {/* Frise chronologique interactive */}
+          <ol className="relative flex flex-col gap-1 border-l border-[var(--color-sand-dark)] pl-6 sm:pl-8">
+            {steps.map((step, idx) => {
+              const isActive = idx === active
               return (
-                <div key={i} className="text-center bg-white rounded-2xl p-8 shadow-sm border border-[#E6DFD3]">
-                  <div className="w-14 h-14 rounded-2xl bg-[#C97A53]/10 flex items-center justify-center mx-auto mb-5">
-                    <Icon size={24} className="text-[#C97A53]" />
-                  </div>
-                  <div className="font-serif text-4xl lg:text-5xl font-semibold text-[#2E4033] mb-2">
-                    {stat.number}
-                  </div>
-                  <p className="text-sm text-[#2E4033]/50 leading-relaxed">
-                    {t(stat.labelKey)}
-                  </p>
-                </div>
-              );
+                <li key={step.title} className="relative py-4">
+                  <button
+                    onClick={() => setActive(idx)}
+                    className="group flex w-full items-start gap-4 text-left"
+                  >
+                    <span
+                      className={`absolute -left-[33px] top-6 flex h-4 w-4 items-center justify-center rounded-full border-2 transition-colors sm:-left-[41px] ${
+                        isActive
+                          ? 'border-[var(--color-terracotta)] bg-[var(--color-terracotta)]'
+                          : 'border-[var(--color-sand-dark)] bg-[var(--color-ivory)]'
+                      }`}
+                    />
+                    <div>
+                      <span
+                        className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${
+                          isActive ? 'text-[var(--color-terracotta)]' : 'text-[var(--color-olive)]/45'
+                        }`}
+                      >
+                        {t('atelier.stepLabel')} {idx + 1}
+                      </span>
+                      <h3
+                        className={`mt-1 font-serif text-xl transition-colors sm:text-2xl ${
+                          isActive ? 'text-[var(--color-olive)]' : 'text-[var(--color-olive)]/55'
+                        }`}
+                      >
+                        {step.title}
+                      </h3>
+                      <p
+                        className={`mt-2 max-w-md text-sm leading-relaxed transition-all ${
+                          isActive
+                            ? 'max-h-40 text-[var(--color-olive)]/75 opacity-100'
+                            : 'max-h-0 overflow-hidden text-[var(--color-olive)]/0 opacity-0 sm:max-h-40 sm:text-[var(--color-olive)]/60 sm:opacity-70'
+                        }`}
+                      >
+                        {step.text}
+                      </p>
+                    </div>
+                  </button>
+                </li>
+              )
             })}
-          </div>
+          </ol>
         </div>
-
-   
-
       </div>
     </section>
-  );
-};
-
-export default Atelier;
+  )
+}

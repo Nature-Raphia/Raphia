@@ -22,7 +22,7 @@ const Home: React.FC = () => {
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 text-xs font-medium text-[#C97A53] uppercase tracking-widest mb-4">
               <span className="w-8 h-px bg-[#C97A53]" />
-              Collection Signature
+              {t('home.featured.label')}
               <span className="w-8 h-px bg-[#C97A53]" />
             </span>
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-[#2E4033] mb-4">
@@ -201,71 +201,168 @@ const Home: React.FC = () => {
       </section>
 
       {/* ===== ESPACE PROFESSIONNEL ===== */}
-      <section className="py-24 bg-[#2E4033] relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-[#C97A53]/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#E6DFD3]/5 rounded-full blur-3xl" />
+ 
+
+<section className="relative isolate overflow-hidden">
+  {/* IMAGE D'ARRIÈRE-PLAN */}
+  <div className="absolute inset-0 -z-20">
+    <img
+      src="https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d"
+      alt={t('home.b2b.alt')}
+      className="h-full w-full object-cover opacity-80"
+    />
+  </div>
+
+  {/* OVERLAY VERT TRANSPARENT */}
+  <div className="absolute inset-0 -z-10 bg-[#2E4033]/65" />
+
+  {/* DÉGRADÉ POUR LE TEXTE */}
+  <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#2E4033]/90 via-[#2E4033]/65 to-[#2E4033]/30" />
+
+  {/* CONTENU */}
+  <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-10 lg:py-28">
+    <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+
+      {/* COLONNE GAUCHE */}
+      <div className="max-w-2xl">
+
+        {/* SURTITRE */}
+        <div className="mb-5 flex items-center gap-3">
+          <span className="h-px w-10 bg-[#C97A53]" />
+
+          <span className="text-[10px] font-medium uppercase tracking-[0.35em] text-[#E0A17F]">
+            {t('home.b2b.label')}
+          </span>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <Building2 size={40} className="text-[#C97A53] mb-6" />
-              <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-6">
-                Vous êtes un professionnel ?
-              </h2>
-              <p className="text-white/70 text-lg leading-relaxed mb-8 max-w-lg">
-                Concept-stores, boutiques hôtelières, e-shops : découvrez notre programme grossiste, nos éditions exclusives et notre accompagnement dédié.
-              </p>
-              <Link
-                to="/b2b"
-                className="inline-flex items-center gap-2 bg-[#C97A53] hover:bg-[#a8623e] text-white px-8 py-4 rounded-full font-light text-sm tracking-wide transition-all duration-300 hover:shadow-xl hover:shadow-[#C97A53]/40"
-              >
-                Accéder à l'Espace B2B
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <h3 className="font-serif text-xl text-white mb-4">Contactez notre équipe</h3>
-              <p className="text-white/50 text-sm mb-6">Pour toute demande professionnelle, nous répondons sous 24h.</p>
-              <div className="space-y-4">
-                <a href="tel:+261347640116" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
-                  <Phone size={18} className="text-[#C97A53]" />
-                  <span>+261 34 76 401 16</span>
-                </a>
-                <a href="mailto:contact@natureraphia-mahalia.mg" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
-                  <Mail size={18} className="text-[#C97A53]" />
-                  <span>contact@natureraphia-mahalia.mg</span>
-                </a>
-                <a href="https://wa.me/261347640116" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-white/80 hover:text-white transition-colors">
-                  <MessageCircle size={18} className="text-[#25D366]" />
-                  <span>WhatsApp B2B</span>
-                </a>
-              </div>
-            </div>
+
+        {/* TITRE */}
+        <h2 className="font-serif text-4xl font-light leading-[1.1] text-white sm:text-5xl lg:text-6xl">
+          {t('home.b2b.title')}
+        </h2>
+
+        {/* DESCRIPTION */}
+        <p className="mt-6 max-w-xl text-sm leading-7 text-white/75 sm:text-base md:text-lg">
+          {t('home.b2b.subtitle')}
+        </p>
+
+        {/* BOUTON */}
+        <div className="mt-8">
+            <Link
+              to="/b2b"
+              className="group inline-flex items-center gap-3 rounded-full bg-[#C97A53] px-6 py-3.5 text-[10px] font-medium uppercase tracking-[0.25em] text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#B86A45] hover:shadow-xl sm:px-7 sm:py-4"
+            >
+              <span>{t('home.b2b.cta')}</span>
+
+              <ArrowRight
+                size={15}
+                strokeWidth={1.8}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </Link>
+        </div>
+      </div>
+
+      {/* CARTE CONTACT */}
+      <div className="lg:pl-10">
+        <div className="rounded-2xl  sm:p-8">
+
+       
+
+          {/* TITRE */}
+          <h3 className="font-serif text-xl font-light text-white sm:text-2xl">
+            {t('home.b2b.contact.title')}
+          </h3>
+
+          <p className="mt-3 text-sm leading-6 text-white/60">
+            {t('home.b2b.contact.desc')}
+          </p>
+
+          {/* CONTACTS */}
+          <div className="mt-7 space-y-5">
+
+            {/* TÉLÉPHONE */}
+            <a
+              href="tel:+261347640116"
+              className="group flex items-center gap-4 text-sm text-white/75 transition-colors hover:text-white"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10">
+                <Phone
+                  size={16}
+                  strokeWidth={1.6}
+                  className="text-[#C97A53]"
+                />
+              </span>
+
+              <span>{t('home.b2b.contact.phoneLabel')} : +261 34 76 401 16</span>
+            </a>
+
+            {/* EMAIL */}
+            <a
+              href="mailto:contact@natureraphia-mahalia.mg"
+              className="group flex items-center gap-4 text-sm text-white/75 transition-colors hover:text-white"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10">
+                <Mail
+                  size={16}
+                  strokeWidth={1.6}
+                  className="text-[#C97A53]"
+                />
+              </span>
+
+              <span className="break-all">
+                {t('home.b2b.contact.emailLabel')} : contact@natureraphia-mahalia.mg
+              </span>
+            </a>
+
+            {/* WHATSAPP */}
+            <a
+              href="https://wa.me/261347640116"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-4 text-sm text-white/75 transition-colors hover:text-white"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10">
+                <MessageCircle
+                  size={16}
+                  strokeWidth={1.6}
+                  className="text-[#25D366]"
+                />
+              </span>
+
+              <span>{t('home.b2b.contact.whatsapp')}</span>
+            </a>
+
           </div>
         </div>
-      </section>
+      </div>
 
-  
+    </div>
+  </div>
+</section>
+
+
+   
+
+
     </div>
   );
 };
 
 // Icons used inline
 const Leaf = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1a7 7 0 0 1 11.9 4.9"/><path d="M12 20V10"/><path d="M7 13a5 5 0 0 0 10 0"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1a7 7 0 0 1 11.9 4.9" /><path d="M12 20V10" /><path d="M7 13a5 5 0 0 0 10 0" /></svg>
 );
 const Users = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
 );
 const Sparkles = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
 );
 const Heart = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
 );
 const Building2 = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" /><path d="M9 22v-4h6v4" /><circle cx="9" cy="6" r="1" /><circle cx="15" cy="6" r="1" /></svg>
 );
 
 export default Home;

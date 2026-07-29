@@ -35,9 +35,7 @@ const Hero: React.FC = () => {
         </div>
 
         <h1 className={`font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.1] tracking-wide mb-8 transition-all duration-700 delay-100 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ textShadow: '0 0 20px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.2), 0 0 100px rgba(255,255,255,0.1)' }}>
-          De la fibre sauvage{' '}
-          <span className="italic" style={{ color: '#E6DFD3', textShadow: '0 0 20px rgba(230,223,211,0.4), 0 0 50px rgba(230,223,211,0.15)' }}>à l'accessoire d'exception</span>
-          .
+          {t('hero.title')}
         </h1>
 
         <p className={`text-white/70 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10 transition-all duration-700 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ textShadow: '0 0 20px rgba(255,255,255,0.15)' }}>

@@ -60,7 +60,7 @@ const Footer: React.FC = () => {
 
           {/* Navigation */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-widest mb-4 text-[#E6DFD3]">Navigation</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-widest mb-4 text-[#E6DFD3]">{t('footer.navigation')}</h4>
             <ul className="space-y-2">
               {[
                 { label: t('nav.home'), to: '/' },
@@ -83,19 +83,19 @@ const Footer: React.FC = () => {
 
           {/* Contact info */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-widest mb-4 text-[#E6DFD3]">Contact</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-widest mb-4 text-[#E6DFD3]">{t('contact.label')}</h4>
             <div className="space-y-3">
               <div className="flex items-start gap-2 text-sm text-white/60">
                 <MapPin size={14} className="flex-shrink-0 mt-0.5 text-[#C97A53]" />
-                <span>Route d'Ambositra, en face Hôtel Royal Palace, Antsirabe Afovoany, Madagascar 110</span>
+                <span>{t('contact.address.value')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
                 <Phone size={14} className="flex-shrink-0 text-[#C97A53]" />
-                <span>+261 34 76 401 16 / +261 32 89 328 08</span>
+                <span>{t('contact.phone')}: +261 34 76 401 16 / +261 32 89 328 08</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
                 <Mail size={14} className="flex-shrink-0 text-[#C97A53]" />
-                <span>contact@natureraphia-mahalia.mg</span>
+                <span>{t('contact.email')}: contact@natureraphia-mahalia.mg</span>
               </div>
             </div>
           </div>
