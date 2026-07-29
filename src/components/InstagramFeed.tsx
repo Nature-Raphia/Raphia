@@ -4,7 +4,6 @@ import { ChevronRight, ExternalLink, Camera } from 'lucide-react';
 
 interface InstagramPost {
   id: string;
-  image: string;
   url: string;
 }
 
@@ -22,16 +21,16 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
   username = 'nature.raphia',
   limit = 36,
   title = 'Suivez l\'atelier',
-  subtitle = 'Les coulisses et les nouvelles pièces sur Instagram',
+  subtitle = '',
   className = '',
 }) => {
   const defaultPosts: InstagramPost[] = [
-    { id: '1', image: '/src/assets/images/atelier-crochet.jpg', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=1' },
-    { id: '2', image: '/src/assets/images/atelier-teinture.jpg', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=2' },
-    { id: '3', image: '/src/assets/images/atelier-recolte.jpg', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=3' },
-    { id: '4', image: '/src/assets/images/product-pochette-lune.webp', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=4' },
-    { id: '5', image: '/src/assets/images/product-panier-ivoire.webp', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=5' },
-    { id: '6', image: '/src/assets/images/showroom-mahalia.webp', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=6' },
+    { id: '1', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=1' },
+    { id: '2', url: 'https://www.instagram.com/p/DbDkxu4Fdkv/?img_index=1' },
+    { id: '3', url: 'https://www.instagram.com/p/DapS19IFS-c/?img_index=1' },
+    { id: '4', url: 'https://www.instagram.com/p/Daesv80lZ3Q/?img_index=1' },
+    { id: '5', url: 'https://www.instagram.com/p/DaFktN6FU0L/?img_index=1' },
+    { id: '6', url: 'https://www.instagram.com/p/DZuqCUMle3h/?img_index=1' },
   ];
 
   const [posts, setPosts] = useState<InstagramPost[]>(
@@ -43,6 +42,18 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
       setPosts(initialPosts.slice(0, limit));
     }
   }, [initialPosts, limit]);
+
+  const toMediaUrl = (url: string) => {
+    try {
+      const u = new URL(url);
+      const match = u.pathname.match(/\/p\/([^\/]+)/);
+      if (!match) return url;
+      const shortcode = match[1];
+      return `https://www.instagram.com/p/${shortcode}/media/?size=l`;
+    } catch {
+      return url;
+    }
+  };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect width="200" height="200" fill="%23F5F1E9"/%3E%3Ctext x="50%25" y="50%25" font-family="serif" font-size="12" fill="%232E4033/40" text-anchor="middle" dy=".3em"%3EInstagram%3C/text%3E%3C/svg%3E';
@@ -74,7 +85,7 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
           )}
         </div>
 
-        {/* GRILLE D'IMAGES */}
+        {/* GRILLE D'IMAGES DEPUIS LES URLS INSTAGRAM */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5 sm:gap-2 lg:gap-2">
           {posts.slice(0, limit).map((post) => (
             <a
@@ -86,7 +97,7 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
             >
               <div className="aspect-square w-full overflow-hidden">
                 <img
-                  src={post.image}
+                  src={toMediaUrl(post.url)}
                   alt=""
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   loading="lazy"
