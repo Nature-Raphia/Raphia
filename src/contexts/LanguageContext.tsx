@@ -161,6 +161,8 @@ const translations: Record<string, Record<Language, string>> = {
   'b2b.feature4.title': { fr: 'Suivi dédié', en: 'Dedicated support' },
   'b2b.feature4.desc': { fr: 'Un contact unique, du brief à la livraison finale.', en: 'A single point of contact, from brief to final delivery.' },
   'b2b.form.title': { fr: 'Demande de partenariat', en: 'Partnership request' },
+  'b2b.form.heading': { fr: 'Espace B2B', en: 'B2B Space' },
+  'b2b.form.error': { fr: 'Une erreur est survenue. Veuillez réessayer.', en: 'An error occurred. Please try again.' },
   'b2b.form.structure': { fr: 'Nom de la structure', en: 'Organization name' },
   'b2b.form.contact': { fr: 'Nom complet', en: 'Full name' },
   'b2b.form.email': { fr: 'Adresse email', en: 'Email address' },
