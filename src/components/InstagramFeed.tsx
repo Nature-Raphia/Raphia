@@ -1,6 +1,7 @@
 // src/components/InstagramFeed.tsx
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ExternalLink, Camera } from 'lucide-react';
+import { useLang } from '../contexts/LanguageContext';
 
 interface InstagramPost {
   id: string;
@@ -20,10 +21,12 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
   posts: initialPosts,
   username = 'nature.raphia',
   limit = 36,
-  title = 'Suivez l\'atelier',
-  subtitle = '',
+  title,
+  subtitle,
   className = '',
 }) => {
+  const { t } = useLang();
+
   const defaultPosts: InstagramPost[] = [
     { id: '1', url: 'https://www.instagram.com/p/DbDmcn4lRh8/?img_index=1' },
     { id: '2', url: 'https://www.instagram.com/p/DbDkxu4Fdkv/?img_index=1' },
@@ -76,7 +79,7 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
             <span className="h-px w-6 bg-[#C97A53]" />
           </div>
           <h2 className="font-serif text-xl font-light text-[#2E4033] sm:text-2xl">
-            {title}
+            {title || t('instagram.title')}
           </h2>
           {subtitle && (
             <p className="mt-2 text-xs text-[#2E4033]/50 sm:text-sm">
@@ -123,7 +126,7 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({
             className="group inline-flex items-center gap-2 rounded-full border border-[#2E4033]/20 bg-transparent px-5 py-2 text-[10px] font-medium uppercase tracking-[0.15em] text-[#2E4033] transition-all hover:border-[#C97A53] hover:bg-[#C97A53] hover:text-white sm:px-6 sm:py-2.5"
           >
             <Camera size={12} />
-            Suivre sur Instagram
+            {t('instagram.follow')}
             <ChevronRight size={12} className="transition-transform group-hover:translate-x-1" />
           </a>
         </div>

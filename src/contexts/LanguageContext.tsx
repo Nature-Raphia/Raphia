@@ -218,6 +218,8 @@ const translations: Record<string, Record<Language, string>> = {
   'home.gallery.alt.creation': { fr: 'Création', en: 'Creation' },
   'home.gallery.alt.nature': { fr: 'Nature', en: 'Nature' },
   'home.gallery.alt.teinture': { fr: 'Teinture', en: 'Dyeing' },
+  'instagram.title': { fr: 'Suivez l\'atelier', en: 'Follow the workshop' },
+  'instagram.follow': { fr: 'Suivre sur Instagram', en: 'Follow on Instagram' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
