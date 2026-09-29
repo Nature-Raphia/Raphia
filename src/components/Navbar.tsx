@@ -38,11 +38,11 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
               <img
                 src="/logo.jpeg"
                 alt="Nature Raphia & Mahalia"
-                className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                className="h-12 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <div className="hidden sm:flex flex-col leading-tight">
-                <span className=" text-sm  text-[#2E4033]">Nature Raphia</span>
-                <span className="text-[10px] text-[#C97A53] tracking-widest uppercase ">& Boutique Mahalia</span>
+                <span className="text-lg md:text-xl font-semibold text-[#2E4033]">Nature Raphia</span>
+                <span className="text-xs md:text-sm text-[#C97A53] tracking-widest uppercase">Madagascar</span>
               </div>
             </Link>
 
