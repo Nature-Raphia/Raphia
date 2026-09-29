@@ -1,10 +1,28 @@
-import React from 'react';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Phone, Mail, Download } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { useLang } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 
+// Généré par `npm run build:apk`
+const APK_URL = '/nature-raphia.apk';
+
 const Footer: React.FC = () => {
   const { t } = useLang();
+  // Dans l'application Android elle-même, inutile de proposer le téléchargement
+  const installed = Capacitor.isNativePlatform();
+  const isIOS = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const [hint, setHint] = useState<string | null>(null);
+
+  const handleDownload = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Un APK ne s'installe pas sur iPhone : on propose l'ajout à l'écran d'accueil
+    if (isIOS) {
+      e.preventDefault();
+      setHint(t('footer.app.ios'));
+    } else {
+      setHint(t('footer.app.android'));
+    }
+  };
 
   return (
     <footer className="bg-[#2E4033] text-white">
@@ -56,6 +74,26 @@ const Footer: React.FC = () => {
                 </svg>
               </a>
             </div>
+
+            {/* Application */}
+            <div className="mt-8">
+              <h4 className="font-semibold text-sm uppercase tracking-widest mb-2 text-[#E6DFD3]">{t('footer.app.title')}</h4>
+              <p className="text-white/60 text-sm mb-4 max-w-xs">{t('footer.app.text')}</p>
+              {installed ? (
+                <span className="inline-flex items-center gap-2 text-sm text-[#25D366]">{t('footer.app.installed')}</span>
+              ) : (
+                <a
+                  href={APK_URL}
+                  download="nature-raphia.apk"
+                  onClick={handleDownload}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#C97A53] hover:bg-[#a8623e] px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                >
+                  <Download size={16} />
+                  {t('footer.app.download')}
+                </a>
+              )}
+              {hint && <p className="mt-3 text-xs text-white/60 max-w-xs">{hint}</p>}
+            </div>
           </div>
 
           {/* Navigation */}
@@ -91,7 +129,7 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
                 <Phone size={14} className="flex-shrink-0 text-[#C97A53]" />
-                <span>{t('contact.phone')}: +261 34 76 401 16 / +261 32 89 328 08</span>
+                <span>{t('contact.phone')}:  +261 32 89 328 08</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
                 <Mail size={14} className="flex-shrink-0 text-[#C97A53]" />

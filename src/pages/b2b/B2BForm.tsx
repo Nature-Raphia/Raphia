@@ -4,7 +4,7 @@ import { useLang } from '../../contexts/LanguageContext';
 import { contactService } from '../../services/contactService';
 import { contactEmailService } from '../../services/contactEmailService';
 
-const WHATSAPP_B2B_NUMBER = '261347640116';
+const WHATSAPP_B2B_NUMBER = '261328932808';
 
 const B2BForm: React.FC = () => {
   const { t } = useLang();
@@ -49,6 +49,9 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
     setLoading(true);
     setError(null);
 
+    // Ouvre WhatsApp immédiatement (avant tout await) pour éviter le blocage des pop-ups
+    sendToWhatsApp(form);
+
     try {
       await contactService.submit({
         name: form.contact,
@@ -67,7 +70,6 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
         type: 'b2b'
       });
 
-      sendToWhatsApp(form);
       setSent(true);
 
       setTimeout(() => {

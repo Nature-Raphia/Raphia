@@ -75,6 +75,8 @@ const translations: Record<string, Record<Language, string>> = {
   'showroom.add': { fr: 'Ajouter à la sélection', en: 'Add to selection' },
   'showroom.outofstock': { fr: 'Épuisé', en: 'Out of stock' },
   'showroom.viewall': { fr: 'Voir toute la collection', en: 'View full collection' },
+  'showroom.discoverCatalog': { fr: 'Découvrir le catalogue', en: 'Discover the catalog' },
+  'showroom.catalogMessage': { fr: 'Bonjour, je souhaiterais recevoir votre catalogue Nature Raphia & Boutique Mahalia.', en: 'Hello, I would like to receive your Nature Raphia & Mahalia Boutique catalog.' },
   'home.featured.title': { fr: 'Nos pièces coup de cœur', en: 'Our favourites' },
 
   // Cart
@@ -139,6 +141,13 @@ const translations: Record<string, Record<Language, string>> = {
   'footer.navigation': { fr: 'Navigation', en: 'Navigation' },
   'footer.rights': { fr: '© 2026 Nature Raphia & Boutique Mahalia. Tous droits réservés.', en: '© 2026 Nature Raphia & Boutique Mahalia. All rights reserved.' },
   'footer.made': { fr: 'Fait avec ♥ à Antsirabe, Madagascar', en: 'Made with ♥ in Antsirabe, Madagascar' },
+  'footer.app.title': { fr: 'Notre application', en: 'Our app' },
+  'footer.app.text': { fr: 'Téléchargez l\'application Nature Raphia pour Android.', en: 'Download the Nature Raphia app for Android.' },
+  'footer.app.download': { fr: 'Télécharger l\'application (Android)', en: 'Download the app (Android)' },
+  'footer.app.android': { fr: 'Ouvrez le fichier téléchargé puis autorisez l\'installation si Android le demande.', en: 'Open the downloaded file, then allow the installation if Android asks.' },
+  'footer.app.installed': { fr: 'Application installée ✓', en: 'App installed ✓' },
+  'footer.app.ios': { fr: 'Sur iPhone : touchez « Partager » puis « Sur l\'écran d\'accueil ».', en: 'On iPhone: tap "Share" then "Add to Home Screen".' },
+  'footer.app.manual': { fr: 'Ouvrez le menu de votre navigateur puis choisissez « Installer l\'application » ou « Ajouter à l\'écran d\'accueil ».', en: 'Open your browser menu and choose "Install app" or "Add to Home Screen".' },
 
   // Admin
   'admin.title': { fr: 'Espace Administration', en: 'Administration Space' },
@@ -170,7 +179,7 @@ const translations: Record<string, Record<Language, string>> = {
   'b2b.form.projectType': { fr: 'Type de projet', en: 'Project type' },
   'b2b.form.volume': { fr: 'Volume estimé', en: 'Estimated volume' },
   'b2b.form.message': { fr: 'Message (optionnel)', en: 'Message (optional)' },
-  'b2b.form.submit': { fr: 'Demander le catalogue', en: 'Request the catalog' },
+  'b2b.form.submit': { fr: 'Demander un devis', en: 'Request a quote' },
   'b2b.form.ph.structure': { fr: 'Votre structure', en: 'Your organization' },
   'b2b.form.ph.contact': { fr: 'Votre nom', en: 'Your name' },
   'b2b.form.ph.email': { fr: 'email@example.com', en: 'you@company.com' },

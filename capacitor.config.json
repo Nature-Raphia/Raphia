@@ -1,0 +1,8 @@
+{
+  "appId": "mg.natureraphia.app",
+  "appName": "Nature Raphia",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#F5F1E9"
+  }
+}
