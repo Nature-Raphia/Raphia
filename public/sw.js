@@ -15,6 +15,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  // Les vidéos sont lues par morceaux (réponses 206) que le cache ne peut pas stocker
+  if (request.headers.has('range')) return;
 
   event.respondWith(
     fetch(request)

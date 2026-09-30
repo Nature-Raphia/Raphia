@@ -1,11 +1,6 @@
 import { useState } from 'react'
 import { useLang } from '../contexts/LanguageContext'
-import recolte from '../assets/images/atelier-recolte.jpg'
-import tri from '../assets/images/atelier-tri.jpg'
-import teinture from '../assets/images/atelier-teinture.jpg'
-import crochet from '../assets/images/atelier-crochet.jpg'
-
-const IMAGES = [recolte, tri, teinture, crochet]
+const IMAGES = ['/1.jpeg', '/2.jpeg', '/3.jpeg', '/4.jpeg']
 
 export default function Atelier() {
   const { t } = useLang()
