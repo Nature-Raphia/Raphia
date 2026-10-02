@@ -41,8 +41,11 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 className="h-12 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <div className="hidden sm:flex flex-col leading-tight">
-                <span className="text-lg md:text-xl font-semibold text-[#2E4033]">Nature Raphia</span>
-                <span className="text-xs md:text-sm text-[#C97A53] tracking-widest uppercase">Madagascar</span>
+                <span className="text-xl md:text-2xl font-semibold text-[#2E4033]">Nature Raphia</span>
+                <span className="text-xs md:text-sm text-[#C97A53] tracking-widest uppercase xl:hidden">Madagascar</span>
+                <span className="hidden xl:block text-[11px] text-[#C97A53] leading-snug max-w-[15rem]">
+                  {t('brand.tagline')}
+                </span>
               </div>
             </Link>
 

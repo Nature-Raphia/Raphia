@@ -8,6 +8,9 @@ interface LanguageContextType {
 }
 
 const translations: Record<string, Record<Language, string>> = {
+  // Brand
+  'brand.tagline': { fr: 'Fabricant et fournisseur d\'articles en raphia à Madagascar', en: 'Manufacturer and supplier of raphia goods in Madagascar' },
+
   // Nav
   'nav.home': { fr: 'Accueil', en: 'Home' },
   'nav.collections': { fr: 'Collections', en: 'Collections' },
@@ -160,6 +163,10 @@ const translations: Record<string, Record<Language, string>> = {
   'b2b.hero.title': { fr: 'Un partenariat sur mesure.', en: 'A tailored partnership.' },
   'b2b.hero.subtitle': { fr: 'Concept-stores, boutiques hôtelières, e-shops premium : nous accompagnons vos sélections avec des éditions exclusives, des délais dédiés et un service white-glove.', en: 'Concept stores, hotel boutiques, premium e-shops: we support your selections with exclusive editions, dedicated timelines and white-glove service.' },
   'b2b.hero.cta': { fr: 'Explorer la collection', en: 'Explore the collection' },
+  'b2b.intro.label': { fr: 'Nature Raphia · Antsirabe', en: 'Nature Raphia · Antsirabe' },
+  'b2b.intro.p1': { fr: 'Basés à Antsirabe, Madagascar, nous créons et fabriquons des articles en raphia pour les boutiques, concept-stores, marques, distributeurs, hôtels, décorateurs, revendeurs et importateurs.', en: 'Based in Antsirabe, Madagascar, we design and manufacture raphia goods for boutiques, concept stores, brands, distributors, hotels, interior designers, resellers and importers.' },
+  'b2b.intro.p2': { fr: 'Notre savoir-faire couvre une large gamme : sacs et cabas, sacs bandoulières…', en: 'Our craftsmanship covers a wide range: totes and shopping bags, shoulder bags…' },
+  'b2b.intro.alt': { fr: 'L\'atelier Nature Raphia à Antsirabe', en: 'The Nature Raphia workshop in Antsirabe' },
   'b2b.features.title': { fr: 'Nos engagements', en: 'Our commitments' },
   'b2b.feature1.title': { fr: 'Éditions exclusives', en: 'Exclusive editions' },
   'b2b.feature1.desc': { fr: 'Formes, motifs et coloris développés pour votre univers.', en: 'Shapes, patterns and colors developed for your universe.' },

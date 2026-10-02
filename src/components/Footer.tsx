@@ -37,10 +37,13 @@ const Footer: React.FC = () => {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <div className="font-serif font-semibold text-lg">Nature Raphia</div>
+                <div className="font-serif font-semibold text-xl md:text-2xl">Nature Raphia</div>
                 <div className="text-[#C97A53] text-xs tracking-widest uppercase">& Boutique Mahalia</div>
               </div>
             </div>
+            <p className="text-[#E6DFD3] text-sm leading-relaxed mb-2 max-w-xs">
+              {t('brand.tagline')}
+            </p>
             <p className="text-white/60 text-sm leading-relaxed mb-6 max-w-xs">
               {t('footer.tagline')}
             </p>
