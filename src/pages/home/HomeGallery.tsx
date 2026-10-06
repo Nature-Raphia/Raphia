@@ -1,16 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLang } from '../../contexts/LanguageContext';
+import { getAtelierSteps } from '../../services/atelierService';
+import type { AtelierStep } from '../../types';
 
 const HomeGallery: React.FC = () => {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const [steps, setSteps] = useState<AtelierStep[]>([]);
 
-  const images = [
-    { src: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/a545435e-6266-4855-91d9-18152e530bbc/atelier-collage.jpg', alt: 'Atelier workshop', span: 'row-span-2 aspect-[4/5]' },
-    { src: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/9a27bdf5-a1ac-47f5-896d-527ec44fffda/showroom-bags.jpg', alt: 'Woven bags', span: 'aspect-square' },
-    { src: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/0260cb67-235d-49a4-affe-87906e192c32/epices.jpg', alt: 'Spices', span: 'aspect-square' },
-    { src: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/74db990f-ea42-4b4f-9d24-654769dfcb22/mahalia-boutique.jpg', alt: 'Mahalia boutique', span: 'aspect-square' },
-    { src: 'https://earthy-artisanal-boutique.lovable.app/__l5e/assets-v1/05281394-da6f-4c1c-bfde-7053394230c4/showroom-decor.jpg', alt: 'Home decor', span: 'aspect-square' },
-  ];
+  useEffect(() => {
+    let cancelled = false;
+
+    getAtelierSteps().then(rows => {
+      if (!cancelled) setSteps(rows);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Galerie entièrement alimentée par l'onglet Atelier de l'admin :
+  // sans étape enregistrée, la section n'est pas affichée.
+  if (steps.length === 0) return null;
 
   return (
     <section className="py-24 bg-white">
@@ -27,9 +38,13 @@ const HomeGallery: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {images.map((img, i) => (
-            <div key={i} className={`relative overflow-hidden rounded-2xl ${img.span}`}>
-              <img src={img.src} alt={img.alt} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+          {steps.map((step, i) => (
+            <div key={step.id} className={`relative overflow-hidden rounded-2xl ${i === 0 ? 'row-span-2 aspect-[4/5]' : 'aspect-square'}`}>
+              <img
+                src={step.image}
+                alt={step.title[lang] || step.title.fr}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
           ))}
