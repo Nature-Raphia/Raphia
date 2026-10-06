@@ -132,7 +132,7 @@ const DashboardTab: React.FC<{ quotes: QuoteRequest[] }> = ({ quotes }) => {
         <StatCard icon={FileText} label="Total demandes" value={quotes?.length || 0} color="#2E4033" />
         <StatCard icon={AlertCircle} label="Nouvelles demandes" value={newQuotes} color="#C97A53" sub={newQuotes > 0 ? '🔴 Action requise' : undefined} />
         <StatCard icon={ShoppingBag} label="Produits actifs" value={initialProducts.filter(p => p.inStock).length} color="#2E4033" />
-        <StatCard icon={TrendingUp} label="Valeur estimée (Ar)" value={`~${totalRevenue.toLocaleString()} Ar`} color="#C97A53" sub="+12% ce mois" />
+        <StatCard icon={TrendingUp} label="Valeur estimée (€)" value={`~${totalRevenue.toLocaleString()} €`} color="#C97A53" sub="+12% ce mois" />
       </div>
 
       {/* Recent quotes */}
@@ -150,7 +150,7 @@ const DashboardTab: React.FC<{ quotes: QuoteRequest[] }> = ({ quotes }) => {
                 <div>
                   <div className="font-medium text-[#2E4033] text-sm">{q.customer?.name || 'Client'}</div>
                   <div className="text-xs text-[#2E4033]/50">{q.customer?.email || ''} · {q.customer?.country || ''}</div>
-                  <div className="text-xs text-[#2E4033]/40 mt-0.5">{q.items?.length || 0} article(s) · ~{q.totalEstimate?.toLocaleString() || 0} Ar</div>
+                  <div className="text-xs text-[#2E4033]/40 mt-0.5">{q.items?.length || 0} article(s) · ~{q.totalEstimate?.toLocaleString() || 0} €</div>
                 </div>
                 <StatusBadge status={q.status || 'nouveau'} />
               </div>
@@ -187,7 +187,7 @@ const DashboardTab: React.FC<{ quotes: QuoteRequest[] }> = ({ quotes }) => {
                     {p.name_fr || p.name || 'Sans nom'}
                   </div>
                   <div className="text-xs text-[#C97A53] font-semibold mt-0.5">
-                    {(p.price || 0).toLocaleString()} Ar
+                    {(p.price || 0).toLocaleString()} €
                   </div>
                 </div>
               </div>
@@ -558,7 +558,7 @@ const ProductsTab: React.FC = () => {
               <tr className="border-b border-[#E6DFD3]">
                 <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Produit</th>
                 <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Catégorie</th>
-                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Prix (Ar)</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Prix (€)</th>
                 <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Stock</th>
                 <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Mis en avant</th>
                 <th className="text-right p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Actions</th>
@@ -579,7 +579,7 @@ const ProductsTab: React.FC = () => {
                   <td className="p-4">
                     <span className="capitalize text-[#2E4033]/70">{p.category || 'N/A'}</span>
                   </td>
-                  <td className="p-4 font-semibold text-[#C97A53]">{p.price?.toLocaleString() || 0} Ar</td>
+                  <td className="p-4 font-semibold text-[#C97A53]">{p.price?.toLocaleString() || 0} €</td>
                   <td className="p-4">
                     <button onClick={() => toggleStock(p.id)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${p.inStock ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-600 hover:bg-red-200'}`}>
@@ -633,7 +633,7 @@ const ProductsTab: React.FC = () => {
               <textarea value={productForm.materials} onChange={e => setProductForm(prev => ({ ...prev, materials: e.target.value }))} placeholder="Matériaux" rows={2} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
 
               <div>
-                <label className="text-xs font-medium text-[#2E4033]/50">Prix en Ariary (Ar)</label>
+                <label className="text-xs font-medium text-[#2E4033]/50">Prix en euros (€)</label>
                 <input
                   value={productForm.price}
                   onChange={e => setProductForm(prev => ({ ...prev, price: e.target.value }))}
@@ -1117,13 +1117,13 @@ const QuotesTab: React.FC<{
                     <img src={item.product?.image || ''} alt={item.product?.name?.fr || ''} className="w-10 h-10 object-cover rounded-lg" />
                     <div className="flex-1">
                       <div className="text-sm font-medium text-[#2E4033]">{item.product?.name?.fr || 'Produit'}</div>
-                      <div className="text-xs text-[#2E4033]/50">×{item.quantity || 0} · {((item.product?.price || 0) * (item.quantity || 0)).toLocaleString()} Ar</div>
+                      <div className="text-xs text-[#2E4033]/50">×{item.quantity || 0} · {((item.product?.price || 0) * (item.quantity || 0)).toLocaleString()} €</div>
                     </div>
                   </div>
                 ))}
                 <div className="flex justify-between font-semibold text-sm p-2 border-t border-[#E6DFD3]">
                   <span>Total estimé</span>
-                  <span className="text-[#C97A53]">~{selected.totalEstimate?.toLocaleString() || 0} Ar</span>
+                  <span className="text-[#C97A53]">~{selected.totalEstimate?.toLocaleString() || 0} €</span>
                 </div>
               </div>
             </div>
@@ -1165,7 +1165,7 @@ const QuotesTab: React.FC<{
                       </div>
                       <div className="text-xs text-[#2E4033]/60">{q.customer?.email || ''} · {q.customer?.country || ''} · {q.customer?.profile === 'grossiste' ? 'B2B' : 'Particulier'}</div>
                       <div className="text-xs text-[#2E4033]/40 mt-1">
-                        {q.items?.length || 0} article(s) · ~{q.totalEstimate?.toLocaleString() || 0} Ar · {q.createdAt ? new Date(q.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
+                        {q.items?.length || 0} article(s) · ~{q.totalEstimate?.toLocaleString() || 0} € · {q.createdAt ? new Date(q.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
