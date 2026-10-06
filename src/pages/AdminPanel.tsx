@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search } from 'lucide-react';
+import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { products as initialProducts } from '../data/products';
-import { Product, QuoteRequest } from '../types';
+import { AtelierStep, Product, QuoteRequest } from '../types';
 import { createProduct, deleteProduct, getAllProducts, updateProduct, uploadProductImage } from '../services/productService';
+import { createAtelierStep, deleteAtelierStep, getAtelierSteps, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
 import { supabase } from '../services/supabase';
 
 // Admin login
@@ -803,6 +804,262 @@ const ProductsTab: React.FC = () => {
   );
 };
 
+// Atelier tab - étapes et photos affichées sur la page L'Atelier
+const AtelierTab: React.FC = () => {
+  const [steps, setSteps] = useState<AtelierStep[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<AtelierStep | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const [stepForm, setStepForm] = useState({
+    image: '',
+    titleFr: '',
+    titleEn: '',
+    descriptionFr: '',
+    descriptionEn: '',
+    sortOrder: '1',
+  });
+
+  const loadSteps = async () => {
+    try {
+      setLoading(true);
+      const items = await getAtelierSteps();
+      setSteps(items);
+    } catch (error) {
+      console.error('Erreur lors du chargement des étapes de l\'atelier:', error);
+      setSteps([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSteps();
+  }, []);
+
+  const openCreateModal = () => {
+    setEditing(null);
+    setShowAdd(true);
+    setStepForm({
+      image: '',
+      titleFr: '',
+      titleEn: '',
+      descriptionFr: '',
+      descriptionEn: '',
+      sortOrder: String(steps.length + 1),
+    });
+  };
+
+  const openEditModal = (step: AtelierStep) => {
+    setEditing(step);
+    setShowAdd(true);
+    setStepForm({
+      image: step.image || '',
+      titleFr: step.title?.fr || '',
+      titleEn: step.title?.en || '',
+      descriptionFr: step.description?.fr || '',
+      descriptionEn: step.description?.en || '',
+      sortOrder: String(step.sortOrder || 1),
+    });
+  };
+
+  const closeModal = () => {
+    setEditing(null);
+    setShowAdd(false);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      const result = await uploadAtelierImage(file);
+      if (result) {
+        setStepForm(prev => ({ ...prev, image: result }));
+      } else {
+        alert('Erreur lors de l\'upload de l\'image.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'upload:', error);
+      alert('Erreur lors de l\'upload de l\'image.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!stepForm.titleFr.trim() || !stepForm.image.trim()) {
+      alert('Le titre et la photo sont obligatoires.');
+      return;
+    }
+
+    setSaving(true);
+
+    const payload: Partial<AtelierStep> = {
+      image: stepForm.image.trim(),
+      title: { fr: stepForm.titleFr.trim(), en: stepForm.titleEn.trim() || stepForm.titleFr.trim() },
+      description: { fr: stepForm.descriptionFr.trim(), en: stepForm.descriptionEn.trim() || stepForm.descriptionFr.trim() },
+      sortOrder: Number(stepForm.sortOrder) || steps.length + 1,
+    };
+
+    try {
+      if (editing) {
+        await updateAtelierStep(editing.id, payload);
+      } else {
+        await createAtelierStep(payload);
+      }
+
+      closeModal();
+      await loadSteps();
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement de l\'étape:', error);
+      alert('Erreur lors de l\'enregistrement de l\'étape.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette étape ?')) return;
+
+    try {
+      await deleteAtelierStep(id);
+      await loadSteps();
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'étape:', error);
+      alert('Erreur lors de la suppression de l\'étape.');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <h3 className="font-semibold text-[#2E4033]">{steps.length} étape(s) de l'atelier</h3>
+        <button onClick={openCreateModal}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors whitespace-nowrap">
+          <Plus size={14} /> Ajouter une étape
+        </button>
+      </div>
+
+      {steps.length === 0 && !loading && (
+        <div className="bg-[#FAF7F2] border border-[#E6DFD3] rounded-2xl p-4 text-sm text-[#2E4033]/60 flex items-start gap-2">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-[#C97A53]" />
+          <span>
+            Aucune étape enregistrée : la page L'Atelier affiche pour l'instant les 4 étapes et photos par défaut du site.
+            Dès que vous ajoutez une étape ici, c'est cette liste qui est affichée.
+          </span>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#E6DFD3]">
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Ordre</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Étape</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Description</th>
+                <th className="text-right p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E6DFD3]">
+              {loading && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Chargement…</td>
+                </tr>
+              )}
+
+              {!loading && steps.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Aucune étape pour le moment</td>
+                </tr>
+              )}
+
+              {steps.map(step => (
+                <tr key={step.id} className="hover:bg-[#FAF7F2] transition-colors">
+                  <td className="p-4 text-[#2E4033]/50">{step.sortOrder}</td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <img src={step.image} alt={step.title.fr} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+                      <div>
+                        <div className="font-medium text-[#2E4033]">{step.title.fr}</div>
+                        <div className="text-xs text-[#2E4033]/40">{step.title.en}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-[#2E4033]/60 max-w-md">
+                    <p className="line-clamp-2">{step.description.fr}</p>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEditModal(step)}
+                        className="p-2 rounded-lg text-[#2E4033] hover:bg-[#E6DFD3] transition-colors" title="Modifier">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(step.id)}
+                        className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Supprimer">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {(editing || showAdd) && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif font-semibold text-[#2E4033]">{editing ? 'Modifier l\'étape' : 'Ajouter une étape'}</h3>
+              <button onClick={closeModal} className="p-1 hover:bg-[#E6DFD3] rounded-lg">
+                <X size={18} className="text-[#2E4033]" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <input value={stepForm.titleFr} onChange={e => setStepForm(prev => ({ ...prev, titleFr: e.target.value }))} placeholder="Titre (français)" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <input value={stepForm.titleEn} onChange={e => setStepForm(prev => ({ ...prev, titleEn: e.target.value }))} placeholder="Titre (anglais, optionnel)" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <textarea value={stepForm.descriptionFr} onChange={e => setStepForm(prev => ({ ...prev, descriptionFr: e.target.value }))} placeholder="Description (français)" rows={3} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <textarea value={stepForm.descriptionEn} onChange={e => setStepForm(prev => ({ ...prev, descriptionEn: e.target.value }))} placeholder="Description (anglais, optionnel)" rows={3} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+
+              <input value={stepForm.image} onChange={e => setStepForm(prev => ({ ...prev, image: e.target.value }))} placeholder="URL de la photo ou upload" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <input type="file" accept="image/*" onChange={async e => { const file = e.target.files?.[0]; if (file) await handleImageUpload(file); }} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm text-[#2E4033]" />
+              {uploading && <p className="text-xs text-[#2E4033]/50">Upload en cours…</p>}
+              {stepForm.image && !uploading && (
+                <img src={stepForm.image} alt="Aperçu" className="w-full h-40 rounded-xl object-cover" />
+              )}
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Ordre d'affichage</label>
+                <input
+                  value={stepForm.sortOrder}
+                  onChange={e => setStepForm(prev => ({ ...prev, sortOrder: e.target.value }))}
+                  type="number"
+                  min={1}
+                  placeholder="Ex: 1"
+                  className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033] mt-1"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button onClick={closeModal}
+                className="flex-1 py-2.5 border border-[#E6DFD3] rounded-xl text-sm font-medium text-[#2E4033] hover:bg-[#E6DFD3] transition-colors">
+                Annuler
+              </button>
+              <button onClick={handleSave} disabled={saving || uploading}
+                className="flex-1 py-2.5 bg-[#2E4033] text-white rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors flex items-center justify-center gap-1 disabled:opacity-50">
+                <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Quotes tab - Sans bouton de suppression
 const QuotesTab: React.FC<{
   quotes: QuoteRequest[];
@@ -929,7 +1186,7 @@ const QuotesTab: React.FC<{
 // Main Admin Panel
 const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'quotes'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'atelier' | 'quotes'>('dashboard');
   const { quotes, updateQuoteStatus } = useCart();
 
   if (!isLoggedIn) {
@@ -946,6 +1203,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const tabs = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
     { id: 'products', icon: Package, label: 'Produits' },
+    { id: 'atelier', icon: ImageIcon, label: 'Atelier' },
     { id: 'quotes', icon: FileText, label: `Devis (${quotes.filter(q => q.status === 'nouveau').length})` },
   ];
 
@@ -1009,6 +1267,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="p-6">
           {activeTab === 'dashboard' && <DashboardTab quotes={quotes} />}
           {activeTab === 'products' && <ProductsTab />}
+          {activeTab === 'atelier' && <AtelierTab />}
           {activeTab === 'quotes' && <QuotesTab quotes={quotes} updateStatus={updateQuoteStatus} />}
         </div>
       </main>
