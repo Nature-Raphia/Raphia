@@ -25,10 +25,12 @@ const mapStepToDb = (step: Partial<AtelierStep>) => ({
 });
 
 export const getAtelierSteps = async (): Promise<AtelierStep[]> => {
+  // created_at départage les étapes qui portent le même ordre d'affichage
   const { data, error } = await supabase
     .from('atelier_steps')
     .select('*')
-    .order('sort_order', { ascending: true });
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true });
 
   if (error) {
     console.error('getAtelierSteps error:', error);
