@@ -1,28 +1,41 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLang } from '../contexts/LanguageContext'
-const IMAGES = ['/1.jpeg', '/2.jpeg', '/3.jpeg', '/4.jpeg']
+import { getAtelierSteps } from '../services/atelierService'
+import type { AtelierStep } from '../types'
+
+// Étapes affichées tant qu'aucune étape n'a été saisie depuis l'espace admin
+const FALLBACK_IMAGES = ['/1.jpeg', '/2.jpeg', '/3.jpeg', '/4.jpeg']
 
 export default function Atelier() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const [active, setActive] = useState(0)
-  const steps = [
-    {
-      title: t('atelier.step1.title'),
-      text: t('atelier.step1.desc'),
-    },
-    {
-      title: t('atelier.step2.title'),
-      text: t('atelier.step2.desc'),
-    },
-    {
-      title: t('atelier.step3.title'),
-      text: t('atelier.step3.desc'),
-    },
-    {
-      title: t('atelier.step4.title'),
-      text: t('atelier.step4.desc'),
-    },
-  ]
+  const [dbSteps, setDbSteps] = useState<AtelierStep[] | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    getAtelierSteps().then(rows => {
+      if (cancelled || rows.length === 0) return
+      setDbSteps(rows)
+      setActive(0)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const steps = dbSteps
+    ? dbSteps.map(step => ({
+        title: step.title[lang] || step.title.fr,
+        text: step.description[lang] || step.description.fr,
+        image: step.image,
+      }))
+    : FALLBACK_IMAGES.map((image, idx) => ({
+        title: t(`atelier.step${idx + 1}.title`),
+        text: t(`atelier.step${idx + 1}.desc`),
+        image,
+      }))
 
   return (
     <section id="atelier" className="bg-[var(--color-ivory)] py-20 sm:py-28">
@@ -42,11 +55,11 @@ export default function Atelier() {
         <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
           {/* Image */}
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl shadow-[var(--color-olive)]/10">
-            {IMAGES.map((img, idx) => (
+            {steps.map((step, idx) => (
               <img
                 key={idx}
-                src={img}
-                alt={steps[idx]?.title}
+                src={step.image}
+                alt={step.title}
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
                   idx === active ? 'opacity-100' : 'opacity-0'
                 }`}
@@ -64,7 +77,7 @@ export default function Atelier() {
             {steps.map((step, idx) => {
               const isActive = idx === active
               return (
-                <li key={step.title} className="relative py-4">
+                <li key={idx} className="relative py-4">
                   <button
                     onClick={() => setActive(idx)}
                     className="group flex w-full items-start gap-4 text-left"

@@ -11,6 +11,14 @@ export interface Product {
   badge?: { fr: string; en: string };
 }
 
+export interface AtelierStep {
+  id: string;
+  image: string;
+  title: { fr: string; en: string };
+  description: { fr: string; en: string };
+  sortOrder: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
