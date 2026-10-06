@@ -8,8 +8,14 @@ import { createProduct, deleteProduct, getAllProducts, updateProduct, uploadProd
 import { createAtelierStep, deleteAtelierStep, getAtelierSteps, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
 import { supabase } from '../services/supabase';
 
+// Identifiants de l'espace admin, en attendant le passage à Supabase Auth.
+// Surchargeables par VITE_ADMIN_EMAIL / VITE_ADMIN_PASSWORD.
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'nature@raphiagmail.com';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'NatureMerge123';
+
 // Admin login
 const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,7 +24,7 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
     e.preventDefault();
     setLoading(true);
     await new Promise(r => setTimeout(r, 800));
-    if (password === 'mahalia2026') {
+    if (email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
       onLogin();
     } else {
       setError(true);
@@ -30,7 +36,7 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
     <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 shadow-lg w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-[#2E4033] flex items-center justify-center mx-auto mb-4 overflow-hidden">
+          <div className="w-28 h-28 rounded-full bg-[#2E4033] flex items-center justify-center mx-auto mb-4 overflow-hidden">
             <img
               src="/logo.jpeg"
               alt="Logo"
@@ -43,18 +49,30 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
+            <label className="text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest block mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => { setEmail(e.target.value); setError(false); }}
+              placeholder="email@example.com"
+              autoComplete="username"
+              className={`w-full px-4 py-3 border-2 rounded-xl text-[#2E4033] focus:outline-none transition-colors ${error ? 'border-red-400' : 'border-[#E6DFD3] focus:border-[#2E4033]'}`}
+            />
+          </div>
+          <div>
             <label className="text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest block mb-2">Mot de passe</label>
             <input
               type="password"
               value={password}
               onChange={e => { setPassword(e.target.value); setError(false); }}
               placeholder="••••••••"
+              autoComplete="current-password"
               className={`w-full px-4 py-3 border-2 rounded-xl text-[#2E4033] focus:outline-none transition-colors ${error ? 'border-red-400' : 'border-[#E6DFD3] focus:border-[#2E4033]'}`}
             />
             {error && (
               <div className="flex items-center gap-1 mt-2 text-red-500 text-xs">
                 <AlertCircle size={12} />
-                <span>Mot de passe incorrect</span>
+                <span>Email ou mot de passe incorrect</span>
               </div>
             )}
           </div>
@@ -62,7 +80,6 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
             className="w-full bg-[#2E4033] hover:bg-[#1a2b1f] text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
             {loading ? <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" /> : 'Se connecter'}
           </button>
-          <p className="text-xs text-center text-[#2E4033]/30">Mot de passe démo : mahalia2026</p>
         </form>
       </div>
     </div>

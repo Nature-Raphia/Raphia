@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, Globe, Phone, Users, Home, BookOpen, FileText, MapPin, ShoppingBag } from 'lucide-react';
+import { Menu, X, Globe, Phone, Users, Home, BookOpen, FileText, MapPin, ShoppingBag, Settings } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
@@ -99,9 +99,11 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
 
               <button
                 onClick={onAdminClick}
-                className="hidden md:flex text-xs text-[#2E4033]/40 hover:text-[#2E4033] transition-colors px-2"
+                className="hidden md:flex items-center justify-center w-10 h-10 rounded-full text-[#2E4033]/70 hover:text-[#2E4033] hover:bg-[#E6DFD3] transition-colors"
+                aria-label="Espace admin"
+                title="Espace admin"
               >
-                ⚙
+                <Settings size={20} />
               </button>
 
               <button
@@ -155,9 +157,9 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
               </button>
               <button
                 onClick={() => { setMobileOpen(false); onAdminClick(); }}
-                className="text-sm text-[#2E4033] border-2 border-[#2E4033] rounded-full px-6 py-2.5 hover:bg-[#2E4033] hover:text-white transition-all duration-300"
+                className="flex items-center gap-2 text-sm text-[#2E4033] border-2 border-[#2E4033] rounded-full px-6 py-2.5 hover:bg-[#2E4033] hover:text-white transition-all duration-300"
               >
-                ⚙ Admin
+                <Settings size={16} /> Admin
               </button>
             </div>
           </div>
