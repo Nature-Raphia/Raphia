@@ -10,7 +10,7 @@ export const emailService = {
     try {
       // Construire la liste des articles
       const itemsList = quote.items.map(item => 
-        `- ${item.product.name.fr} x${item.quantity} : ${(item.product.price * item.quantity).toLocaleString()} Ar`
+        `- ${item.product.name.fr} x${item.quantity} : ${(item.product.price * item.quantity).toLocaleString()} €`
       ).join('\n');
 
       // Préparer les paramètres du template
@@ -40,7 +40,7 @@ export const emailService = {
         total: (quote.totalEstimate || 0).toLocaleString(),
         
         // Message personnalisé
-        message: `Bonjour ${quote.customer.name},\n\nMerci pour votre demande de devis. Voici les détails de votre demande :\n\n${itemsList}\n\nTotal estimé : ${(quote.totalEstimate || 0).toLocaleString()} Ar\n\nNotre équipe vous contactera dans les plus brefs délais pour finaliser votre commande.\n\nCordialement,\nL'équipe Nature Raphia`,
+        message: `Bonjour ${quote.customer.name},\n\nMerci pour votre demande de devis. Voici les détails de votre demande :\n\n${itemsList}\n\nTotal estimé : ${(quote.totalEstimate || 0).toLocaleString()} €\n\nNotre équipe vous contactera dans les plus brefs délais pour finaliser votre commande.\n\nCordialement,\nL'équipe Nature Raphia`,
         
         // Réponse
         reply_to: 'contact@nature-raphia.com',
@@ -70,7 +70,7 @@ export const emailService = {
   async sendAdminNotification(quote: QuoteRequest): Promise<void> {
     try {
       const itemsList = quote.items.map(item => 
-        `- ${item.product.name.fr} x${item.quantity} : ${(item.product.price * item.quantity).toLocaleString()} Ar`
+        `- ${item.product.name.fr} x${item.quantity} : ${(item.product.price * item.quantity).toLocaleString()} €`
       ).join('\n');
 
       const templateParams = {
@@ -86,7 +86,7 @@ export const emailService = {
         customer_message: quote.customer.message || 'Aucun message',
         items: itemsList,
         total: (quote.totalEstimate || 0).toLocaleString(),
-        message: `Nouvelle demande de devis reçue de ${quote.customer.name}.\n\nDétails :\n${itemsList}\n\nTotal estimé : ${(quote.totalEstimate || 0).toLocaleString()} Ar\n\nVeuillez traiter cette demande dans les plus brefs délais.`
+        message: `Nouvelle demande de devis reçue de ${quote.customer.name}.\n\nDétails :\n${itemsList}\n\nTotal estimé : ${(quote.totalEstimate || 0).toLocaleString()} €\n\nVeuillez traiter cette demande dans les plus brefs délais.`
       };
 
       await emailjs.send(

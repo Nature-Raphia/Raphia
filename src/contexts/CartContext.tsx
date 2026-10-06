@@ -107,7 +107,7 @@ Message : ${quote.customer.message || 'Aucun message'}
 Produits :
 ${items || 'Aucun article'}
 
-Total estimé : ${total} Ar`;
+Total estimé : ${total} €`;
   }, []);
 
   const openWhatsAppDirect = useCallback((phone: string, message: string) => {
@@ -140,13 +140,13 @@ Total estimé : ${total} Ar`;
         `<tr>
           <td style="padding: 8px; border-bottom: 1px solid #E6DFD3;">${item.product.name.fr}</td>
           <td style="padding: 8px; text-align: center; border-bottom: 1px solid #E6DFD3;">${item.quantity}</td>
-          <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E6DFD3;">${(item.product.price).toLocaleString()} Ar</td>
-          <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E6DFD3;">${(item.product.price * item.quantity).toLocaleString()} Ar</td>
+          <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E6DFD3;">${(item.product.price).toLocaleString()} €</td>
+          <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E6DFD3;">${(item.product.price * item.quantity).toLocaleString()} €</td>
         </tr>`
       ).join('');
 
       const itemsText = quote.items.map(item => 
-        `- ${item.product.name.fr} x${item.quantity} : ${(item.product.price * item.quantity).toLocaleString()} Ar`
+        `- ${item.product.name.fr} x${item.quantity} : ${(item.product.price * item.quantity).toLocaleString()} €`
       ).join('\n');
 
       // Préparer les paramètres - LE DESTINATAIRE EST LE CLIENT
@@ -199,7 +199,7 @@ Total estimé : ${total} Ar`;
         email: quote.customer.email,
         phone: quote.customer.phone || '',
         subject: `Nouvelle demande de devis - ${quote.id}`,
-        message: `Nouvelle demande de devis Nature Raphia\n\nClient: ${quote.customer.name}\nEmail: ${quote.customer.email}\nTéléphone: ${quote.customer.phone || 'Non renseigné'}\nPays: ${quote.customer.country || 'Non renseigné'}\nProfil: ${quote.customer.profile === 'grossiste' ? 'Grossiste / B2B' : 'Particulier'}\n\nMessage: ${quote.customer.message || 'Aucun message'}\n\nProduits:\n${quote.items.map(item => `- ${item.product.name.fr} x${item.quantity}`).join('\n')}\n\nTotal estimé: ${(quote.totalEstimate || 0).toLocaleString()} Ar`,
+        message: `Nouvelle demande de devis Nature Raphia\n\nClient: ${quote.customer.name}\nEmail: ${quote.customer.email}\nTéléphone: ${quote.customer.phone || 'Non renseigné'}\nPays: ${quote.customer.country || 'Non renseigné'}\nProfil: ${quote.customer.profile === 'grossiste' ? 'Grossiste / B2B' : 'Particulier'}\n\nMessage: ${quote.customer.message || 'Aucun message'}\n\nProduits:\n${quote.items.map(item => `- ${item.product.name.fr} x${item.quantity}`).join('\n')}\n\nTotal estimé: ${(quote.totalEstimate || 0).toLocaleString()} €`,
         type: 'contact'
       });
 
