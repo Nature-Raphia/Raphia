@@ -66,7 +66,7 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
             className="w-full bg-[#2E4033] hover:bg-[#1a2b1f] text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
             {loading ? <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" /> : 'Se connecter'}
           </button>
-          <p className="text-xs text-center text-[#2E4033]/30">Mot de passe démo : mahalia2026</p>
+          {/* <p className="text-xs text-center text-[#2E4033]/30">Mot de passe démo : mahalia2026</p> */}
         </form>
       </div>
     </div>
