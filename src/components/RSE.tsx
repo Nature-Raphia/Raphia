@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Leaf, Users, Award, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
-import { getRseCommitments } from '../services/rseService';
-import { getRseIcon } from '../data/rseIcons';
-import type { RseCommitment } from '../types';
+import { getRseCommitments, getRseWomenSection } from '../services/rseService';
+import { DEFAULT_RSE_WOMEN_SECTION, getRseIcon } from '../data/rseIcons';
+import type { RseCommitment, RseWomenSection } from '../types';
 
 // Engagements affichés tant qu'aucun engagement n'a été saisi depuis l'espace admin
 const FALLBACK_COMMITMENTS = [
@@ -18,6 +18,7 @@ const RSE: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [dbCommitments, setDbCommitments] = useState<RseCommitment[] | null>(null);
+  const [dbWomen, setDbWomen] = useState<RseWomenSection | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,6 +26,11 @@ const RSE: React.FC = () => {
     getRseCommitments().then(rows => {
       if (cancelled || rows.length === 0) return;
       setDbCommitments(rows);
+    });
+
+    getRseWomenSection().then(section => {
+      if (cancelled || !section) return;
+      setDbWomen(section);
     });
 
     return () => {
@@ -45,6 +51,16 @@ const RSE: React.FC = () => {
         title: t(`rse.card${idx + 1}.title`),
         text: t(`rse.card${idx + 1}.desc`),
       }));
+
+  const womenSection = dbWomen ?? DEFAULT_RSE_WOMEN_SECTION;
+  const women = {
+    title: womenSection.title[lang] || womenSection.title.fr,
+    text: womenSection.description[lang] || womenSection.description.fr,
+    images: womenSection.images,
+    badgeTitle: womenSection.badgeTitle[lang] || womenSection.badgeTitle.fr,
+    badgeSubtitle: womenSection.badgeSubtitle[lang] || womenSection.badgeSubtitle.fr,
+    stats: womenSection.stats,
+  };
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => {
@@ -134,21 +150,21 @@ const RSE: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-3xl overflow-hidden aspect-[4/5] row-span-2 shadow-xl">
                 <img
-                  src="/nature.jpg"  // Ajoutez le slash au début
+                  src={women.images.main}
                   alt="Artisane Nature Raphia"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
               <div className="rounded-3xl overflow-hidden aspect-square shadow-lg">
                 <img
-                  src="/vegetal.jpg"  // Ajoutez le slash au début
+                  src={women.images.top}
                   alt="Teinture végétale"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
               <div className="rounded-3xl overflow-hidden aspect-square shadow-lg relative">
                 <img
-                  src="/1.jpg"
+                  src={women.images.bottom}
                   alt="Création raphia"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
@@ -163,8 +179,8 @@ const RSE: React.FC = () => {
                   <Sparkles size={18} className="text-[#C97A53]" />
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-[#2E4033]">Artisanat d'exception</div>
-                  <div className="text-[10px] text-[#2E4033]/50">Savoir-faire unique</div>
+                  <div className="text-xs font-medium text-[#2E4033]">{women.badgeTitle}</div>
+                  <div className="text-[10px] text-[#2E4033]/50">{women.badgeSubtitle}</div>
                 </div>
               </div>
             </div>
@@ -175,21 +191,17 @@ const RSE: React.FC = () => {
           
 
             <h3 className="font-serif text-3xl md:text-4xl font-light text-[#2E4033] mb-4 leading-tight">
-              {t('rse.women.title')}
+              {women.title}
             </h3>
 
             <p className="text-[#2E4033]/60 leading-relaxed mb-10 text-base">
-              {t('rse.women.desc')}
+              {women.text}
             </p>
 
             {/* Stats avec design raffiné */}
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { num: '40+', label: { fr: 'Artisanes', en: 'Artisans' }, icon: Users },
-                { num: '12', label: { fr: "Ans d'expertise", en: 'Years' }, icon: Award },
-                { num: '0%', label: { fr: 'Chimique', en: 'Chemical' }, icon: Leaf },
-              ].map((s, i) => {
-                const StatIcon = s.icon;
+              {women.stats.map((s, i) => {
+                const StatIcon = getRseIcon(s.icon);
                 return (
                   <div key={i} className="group text-center p-4 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                     <div className="flex justify-center mb-2">
@@ -198,7 +210,7 @@ const RSE: React.FC = () => {
                       </div>
                     </div>
                     <div className="font-serif text-2xl font-light text-[#C97A53]">{s.num}</div>
-                    <div className="text-[10px] text-[#2E4033]/50 uppercase tracking-wider mt-1">{s.label.fr}</div>
+                    <div className="text-[10px] text-[#2E4033]/50 uppercase tracking-wider mt-1">{s.label[lang] || s.label.fr}</div>
                   </div>
                 );
               })}

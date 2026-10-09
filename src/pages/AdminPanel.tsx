@@ -3,11 +3,11 @@ import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archi
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { products as initialProducts } from '../data/products';
-import { RSE_COLORS, RSE_ICONS, getRseIcon } from '../data/rseIcons';
-import { AtelierStep, Product, QuoteRequest, RseCommitment } from '../types';
+import { DEFAULT_RSE_WOMEN_SECTION, RSE_COLORS, RSE_ICONS, getRseIcon } from '../data/rseIcons';
+import { AtelierStep, Product, QuoteRequest, RseCommitment, RseStat, RseWomenSection } from '../types';
 import { createProduct, deleteProduct, getAllProducts, updateProduct, uploadProductImage } from '../services/productService';
 import { createAtelierStep, deleteAtelierStep, getAtelierSteps, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
-import { createRseCommitment, deleteRseCommitment, getRseCommitments, updateRseCommitment } from '../services/rseService';
+import { createRseCommitment, deleteRseCommitment, getRseCommitments, getRseWomenSection, saveRseWomenSection, updateRseCommitment, uploadRseImage } from '../services/rseService';
 import { supabase } from '../services/supabase';
 
 // Admin login
@@ -1342,6 +1342,167 @@ const EngagementsTab: React.FC = () => {
   );
 };
 
+// Bloc « L'autonomisation des femmes artisanes » (onglet Femmes artisanes)
+const WomenSectionEditor: React.FC = () => {
+  const [form, setForm] = useState<RseWomenSection>(DEFAULT_RSE_WOMEN_SECTION);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingSlot, setUploadingSlot] = useState<keyof RseWomenSection['images'] | null>(null);
+
+  useEffect(() => {
+    getRseWomenSection()
+      .then(section => {
+        if (section) {
+          setForm(section);
+          setIsSaved(true);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const setBilingual = (field: 'title' | 'description' | 'badgeTitle' | 'badgeSubtitle', lang: 'fr' | 'en', value: string) => {
+    setForm(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
+  const setImage = (slot: keyof RseWomenSection['images'], value: string) => {
+    setForm(prev => ({ ...prev, images: { ...prev.images, [slot]: value } }));
+  };
+
+  const setStat = (index: number, patch: Partial<RseStat>) => {
+    setForm(prev => ({
+      ...prev,
+      stats: prev.stats.map((s, i) => (i === index ? { ...s, ...patch } : s)),
+    }));
+  };
+
+  const handleImageUpload = async (slot: keyof RseWomenSection['images'], file: File) => {
+    try {
+      setUploadingSlot(slot);
+      const result = await uploadRseImage(file);
+      if (result) {
+        setImage(slot, result);
+      } else {
+        alert('Erreur lors de l\'upload de l\'image.');
+      }
+    } finally {
+      setUploadingSlot(null);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.title.fr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+    const result = await saveRseWomenSection({
+      ...form,
+      title: { fr: form.title.fr.trim(), en: form.title.en.trim() || form.title.fr.trim() },
+      description: { fr: form.description.fr.trim(), en: form.description.en.trim() || form.description.fr.trim() },
+    });
+    setSaving(false);
+
+    if (result) {
+      setForm(result);
+      setIsSaved(true);
+      alert('Section enregistrée.');
+    } else {
+      alert('Erreur lors de l\'enregistrement de la section.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+  const imageSlots: { slot: keyof RseWomenSection['images']; label: string }[] = [
+    { slot: 'main', label: 'Grande photo (gauche)' },
+    { slot: 'top', label: 'Petite photo (haut)' },
+    { slot: 'bottom', label: 'Petite photo (bas)' },
+  ];
+
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-[#2E4033]/40">Chargement…</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
+      <div>
+        <h3 className="font-semibold text-[#2E4033]">L'autonomisation des femmes artisanes</h3>
+        {!isSaved && (
+          <p className="text-xs text-[#2E4033]/50 mt-1">
+            Pas encore enregistrée : le site affiche le contenu par défaut ci-dessous. Enregistrez pour le rendre modifiable.
+          </p>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <input value={form.title.fr} onChange={e => setBilingual('title', 'fr', e.target.value)} placeholder="Titre (français)" className={inputClass} />
+        <input value={form.title.en} onChange={e => setBilingual('title', 'en', e.target.value)} placeholder="Titre (anglais, optionnel)" className={inputClass} />
+        <textarea value={form.description.fr} onChange={e => setBilingual('description', 'fr', e.target.value)} placeholder="Texte (français)" rows={4} className={inputClass} />
+        <textarea value={form.description.en} onChange={e => setBilingual('description', 'en', e.target.value)} placeholder="Texte (anglais, optionnel)" rows={4} className={inputClass} />
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-[#2E4033]/50">Photos</label>
+        <div className="grid md:grid-cols-3 gap-4 mt-1">
+          {imageSlots.map(({ slot, label }) => (
+            <div key={slot} className="space-y-2">
+              <div className="text-xs text-[#2E4033]/60">{label}</div>
+              {form.images[slot] && <img src={form.images[slot]} alt={label} className="w-full h-32 rounded-xl object-cover" />}
+              <input value={form.images[slot]} onChange={e => setImage(slot, e.target.value)} placeholder="URL de la photo ou upload" className={inputClass} />
+              <input type="file" accept="image/*" onChange={async e => { const file = e.target.files?.[0]; if (file) await handleImageUpload(slot, file); }} className="w-full px-3 py-2 border border-[#E6DFD3] rounded-xl text-xs text-[#2E4033]" />
+              {uploadingSlot === slot && <p className="text-xs text-[#2E4033]/50">Upload en cours…</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-[#2E4033]/50">Badge sur les photos</label>
+        <div className="grid md:grid-cols-2 gap-3 mt-1">
+          <input value={form.badgeTitle.fr} onChange={e => setBilingual('badgeTitle', 'fr', e.target.value)} placeholder="Titre du badge (français)" className={inputClass} />
+          <input value={form.badgeTitle.en} onChange={e => setBilingual('badgeTitle', 'en', e.target.value)} placeholder="Titre du badge (anglais)" className={inputClass} />
+          <input value={form.badgeSubtitle.fr} onChange={e => setBilingual('badgeSubtitle', 'fr', e.target.value)} placeholder="Sous-titre du badge (français)" className={inputClass} />
+          <input value={form.badgeSubtitle.en} onChange={e => setBilingual('badgeSubtitle', 'en', e.target.value)} placeholder="Sous-titre du badge (anglais)" className={inputClass} />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-[#2E4033]/50">Chiffres clés</label>
+        <div className="grid md:grid-cols-3 gap-4 mt-1">
+          {form.stats.map((stat, i) => (
+            <div key={i} className="space-y-2 p-3 bg-[#FAF7F2] rounded-xl">
+              <input value={stat.num} onChange={e => setStat(i, { num: e.target.value })} placeholder="Chiffre (ex : 40+)" className={inputClass} />
+              <input value={stat.label.fr} onChange={e => setStat(i, { label: { ...stat.label, fr: e.target.value } })} placeholder="Libellé (français)" className={inputClass} />
+              <input value={stat.label.en} onChange={e => setStat(i, { label: { ...stat.label, en: e.target.value } })} placeholder="Libellé (anglais)" className={inputClass} />
+              <div className="grid grid-cols-6 gap-1">
+                {Object.entries(RSE_ICONS).map(([name, { icon: Icon, label }]) => (
+                  <button
+                    key={name}
+                    type="button"
+                    title={label}
+                    onClick={() => setStat(i, { icon: name })}
+                    className={`aspect-square rounded-lg border flex items-center justify-center transition-colors ${stat.icon === name ? 'border-[#2E4033] bg-[#E6DFD3]' : 'border-[#E6DFD3] bg-white hover:bg-[#FAF7F2]'}`}
+                  >
+                    <Icon size={14} className="text-[#C97A53]" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={handleSave} disabled={saving || uploadingSlot !== null}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors disabled:opacity-50">
+          <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer la section'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Quotes tab - Sans bouton de suppression
 const QuotesTab: React.FC<{
   quotes: QuoteRequest[];
@@ -1468,7 +1629,7 @@ const QuotesTab: React.FC<{
 // Main Admin Panel
 const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'atelier' | 'engagements' | 'quotes'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'atelier' | 'engagements' | 'artisanes' | 'quotes'>('dashboard');
   const { quotes, updateQuoteStatus } = useCart();
 
   if (!isLoggedIn) {
@@ -1487,6 +1648,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     { id: 'products', icon: Package, label: 'Produits' },
     { id: 'atelier', icon: ImageIcon, label: 'Atelier' },
     { id: 'engagements', icon: Leaf, label: 'Engagements' },
+    { id: 'artisanes', icon: Users, label: 'Femmes artisanes' },
     { id: 'quotes', icon: FileText, label: `Devis (${quotes.filter(q => q.status === 'nouveau').length})` },
   ];
 
@@ -1552,6 +1714,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {activeTab === 'products' && <ProductsTab />}
           {activeTab === 'atelier' && <AtelierTab />}
           {activeTab === 'engagements' && <EngagementsTab />}
+          {activeTab === 'artisanes' && <WomenSectionEditor />}
           {activeTab === 'quotes' && <QuotesTab quotes={quotes} updateStatus={updateQuoteStatus} />}
         </div>
       </main>

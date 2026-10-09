@@ -28,6 +28,21 @@ export interface RseCommitment {
   sortOrder: number;
 }
 
+export interface RseStat {
+  num: string;
+  icon: string;
+  label: { fr: string; en: string };
+}
+
+export interface RseWomenSection {
+  title: { fr: string; en: string };
+  description: { fr: string; en: string };
+  images: { main: string; top: string; bottom: string };
+  badgeTitle: { fr: string; en: string };
+  badgeSubtitle: { fr: string; en: string };
+  stats: RseStat[];
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
