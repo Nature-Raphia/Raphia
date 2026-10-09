@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon, Leaf, Home } from 'lucide-react';
+import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon, Leaf, Home, Star, MessageSquareQuote } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { products as initialProducts } from '../data/products';
 import { DEFAULT_RSE_WOMEN_SECTION, RSE_COLORS, RSE_ICONS, getRseIcon } from '../data/rseIcons';
-import { AtelierPageHeader, AtelierStep, HomeAtelierSection, Product, QuoteRequest, RseCommitment, RseStat, RseWomenSection } from '../types';
+import { AtelierPageHeader, AtelierStep, HomeAtelierSection, Product, QuoteRequest, RseCommitment, RseStat, RseWomenSection, Testimonial } from '../types';
+import { createTestimonial, deleteTestimonial, getTestimonials, updateTestimonial } from '../services/testimonialService';
 import { createProduct, deleteProduct, getAllProducts, updateProduct, uploadProductImage } from '../services/productService';
 import { createAtelierStep, deleteAtelierStep, getAtelierPageHeader, getAtelierSteps, getHomeAtelierSection, saveAtelierPageHeader, saveHomeAtelierSection, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
 import homeAtelierDefaultImage from '../assets/images/atelier-crochet.jpg';
@@ -1723,6 +1724,250 @@ const WomenSectionEditor: React.FC = () => {
   );
 };
 
+// Témoignages tab - « Regards de nos partenaires » sur la page d'accueil
+const TestimonialsTab: React.FC = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Testimonial | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const emptyForm = (sortOrder: number) => ({
+    quoteFr: '',
+    quoteEn: '',
+    name: '',
+    roleFr: '',
+    roleEn: '',
+    rating: 5,
+    sortOrder: String(sortOrder),
+  });
+  const [testimonialForm, setTestimonialForm] = useState(emptyForm(1));
+
+  const loadTestimonials = async () => {
+    try {
+      setLoading(true);
+      setTestimonials(await getTestimonials());
+    } catch (error) {
+      console.error('Erreur lors du chargement des témoignages:', error);
+      setTestimonials([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const openCreateModal = () => {
+    setEditing(null);
+    setShowAdd(true);
+    setTestimonialForm(emptyForm(testimonials.length + 1));
+  };
+
+  const openEditModal = (testimonial: Testimonial) => {
+    setEditing(testimonial);
+    setShowAdd(true);
+    setTestimonialForm({
+      quoteFr: testimonial.quote?.fr || '',
+      quoteEn: testimonial.quote?.en || '',
+      name: testimonial.name || '',
+      roleFr: testimonial.role?.fr || '',
+      roleEn: testimonial.role?.en || '',
+      rating: testimonial.rating || 5,
+      sortOrder: String(testimonial.sortOrder || 1),
+    });
+  };
+
+  const closeModal = () => {
+    setEditing(null);
+    setShowAdd(false);
+  };
+
+  const handleSave = async () => {
+    if (!testimonialForm.quoteFr.trim() || !testimonialForm.name.trim()) {
+      alert('Le témoignage et le nom sont obligatoires.');
+      return;
+    }
+
+    setSaving(true);
+
+    const payload: Partial<Testimonial> = {
+      quote: { fr: testimonialForm.quoteFr.trim(), en: testimonialForm.quoteEn.trim() || testimonialForm.quoteFr.trim() },
+      name: testimonialForm.name.trim(),
+      role: { fr: testimonialForm.roleFr.trim(), en: testimonialForm.roleEn.trim() || testimonialForm.roleFr.trim() },
+      rating: testimonialForm.rating,
+      sortOrder: Number(testimonialForm.sortOrder) || testimonials.length + 1,
+    };
+
+    try {
+      const result = editing
+        ? await updateTestimonial(editing.id, payload)
+        : await createTestimonial(payload);
+
+      if (!result) {
+        alert('Erreur lors de l\'enregistrement du témoignage.');
+        return;
+      }
+
+      closeModal();
+      await loadTestimonials();
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement du témoignage:', error);
+      alert('Erreur lors de l\'enregistrement du témoignage.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce témoignage ?')) return;
+
+    try {
+      await deleteTestimonial(id);
+      await loadTestimonials();
+    } catch (error) {
+      console.error('Erreur lors de la suppression du témoignage:', error);
+      alert('Erreur lors de la suppression du témoignage.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <h3 className="font-semibold text-[#2E4033]">{testimonials.length} témoignage(s)</h3>
+        <button onClick={openCreateModal}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors whitespace-nowrap">
+          <Plus size={14} /> Ajouter un témoignage
+        </button>
+      </div>
+
+      {testimonials.length === 0 && !loading && (
+        <div className="bg-[#FAF7F2] border border-[#E6DFD3] rounded-2xl p-4 text-sm text-[#2E4033]/60 flex items-start gap-2">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-[#C97A53]" />
+          <span>
+            Aucun témoignage enregistré : la section « Regards de nos partenaires » affiche pour l'instant les 4 témoignages par défaut du site.
+            Dès que vous ajoutez un témoignage ici, c'est cette liste qui est affichée.
+          </span>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#E6DFD3]">
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Ordre</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Partenaire</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Témoignage</th>
+                <th className="text-right p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E6DFD3]">
+              {loading && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Chargement…</td>
+                </tr>
+              )}
+
+              {!loading && testimonials.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Aucun témoignage pour le moment</td>
+                </tr>
+              )}
+
+              {testimonials.map(testimonial => (
+                <tr key={testimonial.id} className="hover:bg-[#FAF7F2] transition-colors">
+                  <td className="p-4 text-[#2E4033]/50">{testimonial.sortOrder}</td>
+                  <td className="p-4">
+                    <div className="font-medium text-[#2E4033]">{testimonial.name}</div>
+                    <div className="text-xs text-[#2E4033]/40">{testimonial.role.fr}</div>
+                    <div className="flex gap-0.5 mt-1">
+                      {[...Array(testimonial.rating)].map((_, j) => (
+                        <Star key={j} size={10} className="fill-[#C97A53] text-[#C97A53]" />
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-4 text-[#2E4033]/60 max-w-md">
+                    <p className="line-clamp-2 italic">« {testimonial.quote.fr} »</p>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEditModal(testimonial)}
+                        className="p-2 rounded-lg text-[#2E4033] hover:bg-[#E6DFD3] transition-colors" title="Modifier">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(testimonial.id)}
+                        className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Supprimer">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {(editing || showAdd) && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif font-semibold text-[#2E4033]">{editing ? 'Modifier le témoignage' : 'Ajouter un témoignage'}</h3>
+              <button onClick={closeModal} className="p-1 hover:bg-[#E6DFD3] rounded-lg">
+                <X size={18} className="text-[#2E4033]" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <textarea value={testimonialForm.quoteFr} onChange={e => setTestimonialForm(prev => ({ ...prev, quoteFr: e.target.value }))} placeholder="Témoignage (français)" rows={3} className={inputClass} />
+              <textarea value={testimonialForm.quoteEn} onChange={e => setTestimonialForm(prev => ({ ...prev, quoteEn: e.target.value }))} placeholder="Témoignage (anglais, optionnel)" rows={3} className={inputClass} />
+              <input value={testimonialForm.name} onChange={e => setTestimonialForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nom (ex : Camille R.)" className={inputClass} />
+              <input value={testimonialForm.roleFr} onChange={e => setTestimonialForm(prev => ({ ...prev, roleFr: e.target.value }))} placeholder="Activité et ville (français, ex : Concept-store, Paris)" className={inputClass} />
+              <input value={testimonialForm.roleEn} onChange={e => setTestimonialForm(prev => ({ ...prev, roleEn: e.target.value }))} placeholder="Activité et ville (anglais, optionnel)" className={inputClass} />
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Note</label>
+                <div className="flex gap-1 mt-1">
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button key={n} type="button" onClick={() => setTestimonialForm(prev => ({ ...prev, rating: n }))} className="p-1" title={`${n} étoile(s)`}>
+                      <Star size={20} className={n <= testimonialForm.rating ? 'fill-[#C97A53] text-[#C97A53]' : 'text-[#E6DFD3]'} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Ordre d'affichage</label>
+                <input
+                  value={testimonialForm.sortOrder}
+                  onChange={e => setTestimonialForm(prev => ({ ...prev, sortOrder: e.target.value }))}
+                  type="number"
+                  min={1}
+                  placeholder="Ex: 1"
+                  className={`${inputClass} mt-1`}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button onClick={closeModal}
+                className="flex-1 py-2.5 border border-[#E6DFD3] rounded-xl text-sm font-medium text-[#2E4033] hover:bg-[#E6DFD3] transition-colors">
+                Annuler
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                className="flex-1 py-2.5 bg-[#2E4033] text-white rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors flex items-center justify-center gap-1 disabled:opacity-50">
+                <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Quotes tab - Sans bouton de suppression
 const QuotesTab: React.FC<{
   quotes: QuoteRequest[];
@@ -1849,7 +2094,7 @@ const QuotesTab: React.FC<{
 // Main Admin Panel
 const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'homeAtelier' | 'atelier' | 'engagements' | 'artisanes' | 'quotes'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'homeAtelier' | 'atelier' | 'engagements' | 'artisanes' | 'testimonials' | 'quotes'>('dashboard');
   const { quotes, updateQuoteStatus } = useCart();
 
   if (!isLoggedIn) {
@@ -1870,6 +2115,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     { id: 'atelier', icon: ImageIcon, label: 'Atelier' },
     { id: 'engagements', icon: Leaf, label: 'Engagements' },
     { id: 'artisanes', icon: Users, label: 'Femmes artisanes' },
+    { id: 'testimonials', icon: MessageSquareQuote, label: 'Témoignages' },
     { id: 'quotes', icon: FileText, label: `Devis (${quotes.filter(q => q.status === 'nouveau').length})` },
   ];
 
@@ -1942,6 +2188,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           )}
           {activeTab === 'engagements' && <EngagementsTab />}
           {activeTab === 'artisanes' && <WomenSectionEditor />}
+          {activeTab === 'testimonials' && <TestimonialsTab />}
           {activeTab === 'quotes' && <QuotesTab quotes={quotes} updateStatus={updateQuoteStatus} />}
         </div>
       </main>

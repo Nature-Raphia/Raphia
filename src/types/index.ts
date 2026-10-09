@@ -57,6 +57,15 @@ export interface RseWomenSection {
   stats: RseStat[];
 }
 
+export interface Testimonial {
+  id: string;
+  quote: { fr: string; en: string };
+  name: string;
+  role: { fr: string; en: string };
+  rating: number;
+  sortOrder: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
