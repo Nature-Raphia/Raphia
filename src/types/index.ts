@@ -19,6 +19,20 @@ export interface AtelierStep {
   sortOrder: number;
 }
 
+export interface AtelierPageHeader {
+  eyebrow: { fr: string; en: string };
+  title: { fr: string; en: string };
+  intro: { fr: string; en: string };
+}
+
+export interface HomeAtelierSection {
+  image: string;
+  label: { fr: string; en: string };
+  title: { fr: string; en: string };
+  subtitle: { fr: string; en: string };
+  cta: { fr: string; en: string };
+}
+
 export interface RseCommitment {
   id: string;
   icon: string;

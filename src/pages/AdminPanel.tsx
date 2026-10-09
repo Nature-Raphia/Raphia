@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon, Leaf } from 'lucide-react';
+import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon, Leaf, Home } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { products as initialProducts } from '../data/products';
 import { DEFAULT_RSE_WOMEN_SECTION, RSE_COLORS, RSE_ICONS, getRseIcon } from '../data/rseIcons';
-import { AtelierStep, Product, QuoteRequest, RseCommitment, RseStat, RseWomenSection } from '../types';
+import { AtelierPageHeader, AtelierStep, HomeAtelierSection, Product, QuoteRequest, RseCommitment, RseStat, RseWomenSection } from '../types';
 import { createProduct, deleteProduct, getAllProducts, updateProduct, uploadProductImage } from '../services/productService';
-import { createAtelierStep, deleteAtelierStep, getAtelierSteps, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
+import { createAtelierStep, deleteAtelierStep, getAtelierPageHeader, getAtelierSteps, getHomeAtelierSection, saveAtelierPageHeader, saveHomeAtelierSection, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
+import homeAtelierDefaultImage from '../assets/images/atelier-crochet.jpg';
 import { createRseCommitment, deleteRseCommitment, getRseCommitments, getRseWomenSection, saveRseWomenSection, updateRseCommitment, uploadRseImage } from '../services/rseService';
 import { supabase } from '../services/supabase';
 
@@ -806,6 +807,97 @@ const ProductsTab: React.FC = () => {
   );
 };
 
+// Contenu actuel de l'en-tête de la page L'Atelier, proposé tant que rien n'est enregistré
+const DEFAULT_ATELIER_HEADER: AtelierPageHeader = {
+  eyebrow: { fr: 'L\'Atelier', en: 'The Workshop' },
+  title: { fr: 'Un savoir-faire tissé à la main.', en: 'Handcrafted expertise.' },
+  intro: {
+    fr: 'Depuis douze ans, nos artisanes transforment le raphia sauvage en pièces d\'exception. Chaque geste — récolte, teinture végétale, crochet — porte la mémoire des hautes terres malgaches.',
+    en: 'For twelve years, our artisans have transformed wild raphia into exceptional pieces. Each gesture — harvest, plant dyeing, crochet — carries the memory of the Malagasy highlands.',
+  },
+};
+
+// En-tête de la page L'Atelier (texte affiché au-dessus des étapes)
+const AtelierHeaderEditor: React.FC = () => {
+  const [form, setForm] = useState<AtelierPageHeader>(DEFAULT_ATELIER_HEADER);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getAtelierPageHeader()
+      .then(header => {
+        if (header) {
+          setForm(header);
+          setIsSaved(true);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const setBilingual = (field: keyof AtelierPageHeader, lang: 'fr' | 'en', value: string) => {
+    setForm(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
+  const handleSave = async () => {
+    if (!form.title.fr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+    const clean = (v: { fr: string; en: string }) => ({ fr: v.fr.trim(), en: v.en.trim() || v.fr.trim() });
+    const result = await saveAtelierPageHeader({
+      eyebrow: clean(form.eyebrow),
+      title: clean(form.title),
+      intro: clean(form.intro),
+    });
+    setSaving(false);
+
+    if (result) {
+      setForm(result);
+      setIsSaved(true);
+      alert('En-tête enregistré.');
+    } else {
+      alert('Erreur lors de l\'enregistrement de l\'en-tête.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-[#2E4033]/40">Chargement…</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+      <div>
+        <h3 className="font-semibold text-[#2E4033]">Texte d'introduction de la page L'Atelier</h3>
+        <p className="text-xs text-[#2E4033]/50 mt-1">
+          Affiché au-dessus des étapes.
+          {!isSaved && ' Pas encore enregistré : le site affiche le contenu par défaut ci-dessous.'}
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <input value={form.eyebrow.fr} onChange={e => setBilingual('eyebrow', 'fr', e.target.value)} placeholder="Surtitre (français)" className={inputClass} />
+        <input value={form.eyebrow.en} onChange={e => setBilingual('eyebrow', 'en', e.target.value)} placeholder="Surtitre (anglais, optionnel)" className={inputClass} />
+        <input value={form.title.fr} onChange={e => setBilingual('title', 'fr', e.target.value)} placeholder="Titre (français)" className={inputClass} />
+        <input value={form.title.en} onChange={e => setBilingual('title', 'en', e.target.value)} placeholder="Titre (anglais, optionnel)" className={inputClass} />
+        <textarea value={form.intro.fr} onChange={e => setBilingual('intro', 'fr', e.target.value)} placeholder="Introduction (français)" rows={4} className={inputClass} />
+        <textarea value={form.intro.en} onChange={e => setBilingual('intro', 'en', e.target.value)} placeholder="Introduction (anglais, optionnel)" rows={4} className={inputClass} />
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={handleSave} disabled={saving}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors disabled:opacity-50">
+          <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer l\'introduction'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Atelier tab - étapes et photos affichées sur la page L'Atelier
 const AtelierTab: React.FC = () => {
   const [steps, setSteps] = useState<AtelierStep[]>([]);
@@ -1342,6 +1434,134 @@ const EngagementsTab: React.FC = () => {
   );
 };
 
+// Contenu actuel du bloc « L'Atelier » de l'accueil, proposé tant que rien n'est enregistré
+const DEFAULT_HOME_ATELIER: HomeAtelierSection = {
+  image: '',
+  label: { fr: 'L\'Atelier · Nature Raphia', en: 'The Workshop · Nature Raphia' },
+  title: { fr: 'Un savoir-faire tissé à la main.', en: 'Handcrafted expertise.' },
+  subtitle: {
+    fr: 'Depuis douze ans, nos artisanes transforment le raphia sauvage en pièces d\'exception. Chaque geste — récolte, teinture végétale, crochet — porte la mémoire des hautes terres malgaches.',
+    en: 'For twelve years, our artisans have transformed wild raphia into exceptional pieces. Each gesture — harvest, plant dyeing, crochet — carries the memory of the Malagasy highlands.',
+  },
+  cta: { fr: 'Notre Histoire', en: 'Our Story' },
+};
+
+// Bloc « L'Atelier » de la page d'accueil (onglet Accueil · Atelier)
+const HomeAtelierEditor: React.FC = () => {
+  const [form, setForm] = useState<HomeAtelierSection>(DEFAULT_HOME_ATELIER);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    getHomeAtelierSection()
+      .then(section => {
+        if (section) {
+          setForm(section);
+          setIsSaved(true);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const setBilingual = (field: 'label' | 'title' | 'subtitle' | 'cta', lang: 'fr' | 'en', value: string) => {
+    setForm(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      const result = await uploadAtelierImage(file);
+      if (result) {
+        setForm(prev => ({ ...prev, image: result }));
+      } else {
+        alert('Erreur lors de l\'upload de l\'image.');
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.title.fr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+    const result = await saveHomeAtelierSection({
+      image: form.image.trim(),
+      label: { fr: form.label.fr.trim(), en: form.label.en.trim() || form.label.fr.trim() },
+      title: { fr: form.title.fr.trim(), en: form.title.en.trim() || form.title.fr.trim() },
+      subtitle: { fr: form.subtitle.fr.trim(), en: form.subtitle.en.trim() || form.subtitle.fr.trim() },
+      cta: { fr: form.cta.fr.trim(), en: form.cta.en.trim() || form.cta.fr.trim() },
+    });
+    setSaving(false);
+
+    if (result) {
+      setForm(result);
+      setIsSaved(true);
+      alert('Section enregistrée.');
+    } else {
+      alert('Erreur lors de l\'enregistrement de la section.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-[#2E4033]/40">Chargement…</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
+      <div>
+        <h3 className="font-semibold text-[#2E4033]">Bloc « L'Atelier » de la page d'accueil</h3>
+        {!isSaved && (
+          <p className="text-xs text-[#2E4033]/50 mt-1">
+            Pas encore enregistré : le site affiche le contenu par défaut ci-dessous. Enregistrez pour le rendre modifiable.
+          </p>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <input value={form.label.fr} onChange={e => setBilingual('label', 'fr', e.target.value)} placeholder="Surtitre (français)" className={inputClass} />
+        <input value={form.label.en} onChange={e => setBilingual('label', 'en', e.target.value)} placeholder="Surtitre (anglais, optionnel)" className={inputClass} />
+        <input value={form.title.fr} onChange={e => setBilingual('title', 'fr', e.target.value)} placeholder="Titre (français)" className={inputClass} />
+        <input value={form.title.en} onChange={e => setBilingual('title', 'en', e.target.value)} placeholder="Titre (anglais, optionnel)" className={inputClass} />
+        <textarea value={form.subtitle.fr} onChange={e => setBilingual('subtitle', 'fr', e.target.value)} placeholder="Texte (français)" rows={4} className={inputClass} />
+        <textarea value={form.subtitle.en} onChange={e => setBilingual('subtitle', 'en', e.target.value)} placeholder="Texte (anglais, optionnel)" rows={4} className={inputClass} />
+        <input value={form.cta.fr} onChange={e => setBilingual('cta', 'fr', e.target.value)} placeholder="Texte du bouton (français)" className={inputClass} />
+        <input value={form.cta.en} onChange={e => setBilingual('cta', 'en', e.target.value)} placeholder="Texte du bouton (anglais, optionnel)" className={inputClass} />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-[#2E4033]/50">Photo (laisser vide pour la photo par défaut)</label>
+        <img src={form.image || homeAtelierDefaultImage} alt="Aperçu" className="w-full max-w-sm h-48 rounded-xl object-cover" />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input value={form.image} onChange={e => setForm(prev => ({ ...prev, image: e.target.value }))} placeholder="URL de la photo ou upload" className={inputClass} />
+          {form.image && (
+            <button type="button" onClick={() => setForm(prev => ({ ...prev, image: '' }))}
+              className="px-3 py-2 border border-[#E6DFD3] rounded-xl text-xs text-[#2E4033] hover:bg-[#E6DFD3] whitespace-nowrap">
+              Photo par défaut
+            </button>
+          )}
+        </div>
+        <input type="file" accept="image/*" onChange={async e => { const file = e.target.files?.[0]; if (file) await handleImageUpload(file); }} className="w-full px-3 py-2 border border-[#E6DFD3] rounded-xl text-xs text-[#2E4033]" />
+        {uploading && <p className="text-xs text-[#2E4033]/50">Upload en cours…</p>}
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={handleSave} disabled={saving || uploading}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors disabled:opacity-50">
+          <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer la section'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Bloc « L'autonomisation des femmes artisanes » (onglet Femmes artisanes)
 const WomenSectionEditor: React.FC = () => {
   const [form, setForm] = useState<RseWomenSection>(DEFAULT_RSE_WOMEN_SECTION);
@@ -1629,7 +1849,7 @@ const QuotesTab: React.FC<{
 // Main Admin Panel
 const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'atelier' | 'engagements' | 'artisanes' | 'quotes'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'homeAtelier' | 'atelier' | 'engagements' | 'artisanes' | 'quotes'>('dashboard');
   const { quotes, updateQuoteStatus } = useCart();
 
   if (!isLoggedIn) {
@@ -1646,6 +1866,7 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const tabs = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
     { id: 'products', icon: Package, label: 'Produits' },
+    { id: 'homeAtelier', icon: Home, label: 'Accueil · Atelier' },
     { id: 'atelier', icon: ImageIcon, label: 'Atelier' },
     { id: 'engagements', icon: Leaf, label: 'Engagements' },
     { id: 'artisanes', icon: Users, label: 'Femmes artisanes' },
@@ -1712,7 +1933,13 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="p-6">
           {activeTab === 'dashboard' && <DashboardTab quotes={quotes} />}
           {activeTab === 'products' && <ProductsTab />}
-          {activeTab === 'atelier' && <AtelierTab />}
+          {activeTab === 'homeAtelier' && <HomeAtelierEditor />}
+          {activeTab === 'atelier' && (
+            <div className="space-y-8">
+              <AtelierHeaderEditor />
+              <AtelierTab />
+            </div>
+          )}
           {activeTab === 'engagements' && <EngagementsTab />}
           {activeTab === 'artisanes' && <WomenSectionEditor />}
           {activeTab === 'quotes' && <QuotesTab quotes={quotes} updateStatus={updateQuoteStatus} />}

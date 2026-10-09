@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLang } from '../contexts/LanguageContext'
-import { getAtelierSteps } from '../services/atelierService'
-import type { AtelierStep } from '../types'
+import { getAtelierPageHeader, getAtelierSteps } from '../services/atelierService'
+import type { AtelierPageHeader, AtelierStep } from '../types'
 
 // Étapes affichées tant qu'aucune étape n'a été saisie depuis l'espace admin
 const FALLBACK_IMAGES = ['/1.jpeg', '/2.jpeg', '/3.jpeg', '/4.jpeg']
@@ -10,6 +10,7 @@ export default function Atelier() {
   const { t, lang } = useLang()
   const [active, setActive] = useState(0)
   const [dbSteps, setDbSteps] = useState<AtelierStep[] | null>(null)
+  const [dbHeader, setDbHeader] = useState<AtelierPageHeader | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -18,6 +19,11 @@ export default function Atelier() {
       if (cancelled || rows.length === 0) return
       setDbSteps(rows)
       setActive(0)
+    })
+
+    getAtelierPageHeader().then(header => {
+      if (cancelled || !header) return
+      setDbHeader(header)
     })
 
     return () => {
@@ -37,18 +43,22 @@ export default function Atelier() {
         image,
       }))
 
+  // En-tête saisi depuis l'admin, sinon textes par défaut du site
+  const headerText = (field: 'eyebrow' | 'title' | 'intro') =>
+    dbHeader?.[field][lang] || dbHeader?.[field].fr || t(`atelier.${field}`)
+
   return (
     <section id="atelier" className="bg-[var(--color-ivory)] py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-terracotta)]">
-            {t('atelier.eyebrow')}
+            {headerText('eyebrow')}
           </p>
           <h2 className="mt-3 font-serif text-3xl font-medium text-[var(--color-olive)] sm:text-4xl">
-            {t('atelier.title')}
+            {headerText('title')}
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-[var(--color-olive)]/75 sm:text-base">
-            {t('atelier.intro')}
+            {headerText('intro')}
           </p>
         </div>
 
