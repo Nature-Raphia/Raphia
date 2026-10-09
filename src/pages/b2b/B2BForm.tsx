@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, FolderOpen } from 'lucide-react';
+import { MessageCircle, FolderOpen, FileText } from 'lucide-react';
 import { useLang } from '../../contexts/LanguageContext';
 import { contactService } from '../../services/contactService';
 import { contactEmailService } from '../../services/contactEmailService';
@@ -204,6 +204,20 @@ Demande reçue le : ${new Date().toLocaleString('fr-FR')}`;
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-[#C97A53] transition-colors resize-none"
                 placeholder={t('b2b.form.ph.message')}
               />
+            </div>
+
+            {/* Conditions de vente */}
+            <div className="bg-white/5 border border-white/15 rounded-xl p-5">
+              <div className="flex items-center gap-2 text-[#C97A53] text-xs font-medium uppercase tracking-widest mb-3">
+                <FileText size={14} />
+                {t('b2b.form.terms.title')}
+              </div>
+              <p className="text-white/70 text-sm leading-relaxed">
+                {t('b2b.form.terms.deposit')}
+              </p>
+              <p className="text-white/70 text-sm leading-relaxed mt-3">
+                {t('b2b.form.terms.discount')}
+              </p>
             </div>
 
             <button

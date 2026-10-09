@@ -1,16 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 import { useLang } from '../../contexts/LanguageContext';
+import { getTestimonials } from '../../services/testimonialService';
+import type { Testimonial } from '../../types';
+
+// Témoignages affichés tant qu'aucun témoignage n'a été saisi depuis l'espace admin
+const FALLBACK_TESTIMONIALS = [
+  { quote: "Une qualité de tissage rare et des finitions qui subliment chaque saison de notre concept-store.", name: "Camille R.", role: "Concept-store, Paris", rating: 5 },
+  { quote: "Nature Raphia est devenu un partenaire essentiel de notre sélection été. L'authenticité se ressent dès la première pièce.", name: "Sofia L.", role: "Boutique d'hôtel, Milan", rating: 5 },
+  { quote: "Chaque commande arrive impeccable. Nos clientes tombent amoureuses des chapeaux dès qu'elles les touchent.", name: "Elena M.", role: "E-shop mode, Barcelone", rating: 5 },
+  { quote: "Un travail éthique et une histoire humaine forte — exactement ce que nos clients recherchent aujourd'hui.", name: "Marc D.", role: "Boutique déco, Bruxelles", rating: 5 },
+];
 
 const HomeTestimonials: React.FC = () => {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const [dbTestimonials, setDbTestimonials] = useState<Testimonial[] | null>(null);
 
-  const testimonials = [
-    { quote: "Une qualité de tissage rare et des finitions qui subliment chaque saison de notre concept-store.", name: "Camille R.", role: "Concept-store, Paris" },
-    { quote: "Nature Raphia est devenu un partenaire essentiel de notre sélection été. L'authenticité se ressent dès la première pièce.", name: "Sofia L.", role: "Boutique d'hôtel, Milan" },
-    { quote: "Chaque commande arrive impeccable. Nos clientes tombent amoureuses des chapeaux dès qu'elles les touchent.", name: "Elena M.", role: "E-shop mode, Barcelone" },
-    { quote: "Un travail éthique et une histoire humaine forte — exactement ce que nos clients recherchent aujourd'hui.", name: "Marc D.", role: "Boutique déco, Bruxelles" },
-  ];
+  useEffect(() => {
+    let cancelled = false;
+
+    getTestimonials().then(rows => {
+      if (cancelled || rows.length === 0) return;
+      setDbTestimonials(rows);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const testimonials = dbTestimonials
+    ? dbTestimonials.map(item => ({
+        quote: item.quote[lang] || item.quote.fr,
+        name: item.name,
+        role: item.role[lang] || item.role.fr,
+        rating: item.rating,
+      }))
+    : FALLBACK_TESTIMONIALS;
 
   return (
     <section className=" bg-[#FAF7F2]">
@@ -30,7 +56,7 @@ const HomeTestimonials: React.FC = () => {
           {testimonials.map((testimonial, i) => (
             <div key={i} className="bg-white rounded-2xl p-8 shadow-sm border border-[#E6DFD3]">
               <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, j) => (
+                {[...Array(testimonial.rating)].map((_, j) => (
                   <Star key={j} size={14} className="fill-[#C97A53] text-[#C97A53]" />
                 ))}
               </div>

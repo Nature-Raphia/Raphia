@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon } from 'lucide-react';
+import { X, LayoutDashboard, Package, FileText, LogOut, Eye, Check, Clock, Archive, TrendingUp, ShoppingBag, Users, Plus, Pencil, Trash2, Save, AlertCircle, Edit2, Search, Image as ImageIcon, Leaf, Home, Star, MessageSquareQuote } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { products as initialProducts } from '../data/products';
-import { AtelierStep, Product, QuoteRequest } from '../types';
+import { DEFAULT_RSE_WOMEN_SECTION, RSE_COLORS, RSE_ICONS, getRseIcon } from '../data/rseIcons';
+import { AtelierPageHeader, AtelierStep, HomeAtelierSection, Product, QuoteRequest, RseCommitment, RseStat, RseWomenSection, Testimonial } from '../types';
+import { createTestimonial, deleteTestimonial, getTestimonials, updateTestimonial } from '../services/testimonialService';
 import { createProduct, deleteProduct, getAllProducts, updateProduct, uploadProductImage } from '../services/productService';
-import { createAtelierStep, deleteAtelierStep, getAtelierSteps, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
+import { createAtelierStep, deleteAtelierStep, getAtelierPageHeader, getAtelierSteps, getHomeAtelierSection, saveAtelierPageHeader, saveHomeAtelierSection, updateAtelierStep, uploadAtelierImage } from '../services/atelierService';
+import homeAtelierDefaultImage from '../assets/images/atelier-crochet.jpg';
+import { createRseCommitment, deleteRseCommitment, getRseCommitments, getRseWomenSection, saveRseWomenSection, updateRseCommitment, uploadRseImage } from '../services/rseService';
 import { supabase } from '../services/supabase';
 
 // Admin login
@@ -62,7 +66,7 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
             className="w-full bg-[#2E4033] hover:bg-[#1a2b1f] text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
             {loading ? <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" /> : 'Se connecter'}
           </button>
-          <p className="text-xs text-center text-[#2E4033]/30">Mot de passe démo : mahalia2026</p>
+          {/* <p className="text-xs text-center text-[#2E4033]/30">Mot de passe démo : mahalia2026</p> */}
         </form>
       </div>
     </div>
@@ -804,6 +808,97 @@ const ProductsTab: React.FC = () => {
   );
 };
 
+// Contenu actuel de l'en-tête de la page L'Atelier, proposé tant que rien n'est enregistré
+const DEFAULT_ATELIER_HEADER: AtelierPageHeader = {
+  eyebrow: { fr: 'L\'Atelier', en: 'The Workshop' },
+  title: { fr: 'Un savoir-faire tissé à la main.', en: 'Handcrafted expertise.' },
+  intro: {
+    fr: 'Depuis douze ans, nos artisanes transforment le raphia sauvage en pièces d\'exception. Chaque geste — récolte, teinture végétale, crochet — porte la mémoire des hautes terres malgaches.',
+    en: 'For twelve years, our artisans have transformed wild raphia into exceptional pieces. Each gesture — harvest, plant dyeing, crochet — carries the memory of the Malagasy highlands.',
+  },
+};
+
+// En-tête de la page L'Atelier (texte affiché au-dessus des étapes)
+const AtelierHeaderEditor: React.FC = () => {
+  const [form, setForm] = useState<AtelierPageHeader>(DEFAULT_ATELIER_HEADER);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getAtelierPageHeader()
+      .then(header => {
+        if (header) {
+          setForm(header);
+          setIsSaved(true);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const setBilingual = (field: keyof AtelierPageHeader, lang: 'fr' | 'en', value: string) => {
+    setForm(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
+  const handleSave = async () => {
+    if (!form.title.fr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+    const clean = (v: { fr: string; en: string }) => ({ fr: v.fr.trim(), en: v.en.trim() || v.fr.trim() });
+    const result = await saveAtelierPageHeader({
+      eyebrow: clean(form.eyebrow),
+      title: clean(form.title),
+      intro: clean(form.intro),
+    });
+    setSaving(false);
+
+    if (result) {
+      setForm(result);
+      setIsSaved(true);
+      alert('En-tête enregistré.');
+    } else {
+      alert('Erreur lors de l\'enregistrement de l\'en-tête.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-[#2E4033]/40">Chargement…</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+      <div>
+        <h3 className="font-semibold text-[#2E4033]">Texte d'introduction de la page L'Atelier</h3>
+        <p className="text-xs text-[#2E4033]/50 mt-1">
+          Affiché au-dessus des étapes.
+          {!isSaved && ' Pas encore enregistré : le site affiche le contenu par défaut ci-dessous.'}
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <input value={form.eyebrow.fr} onChange={e => setBilingual('eyebrow', 'fr', e.target.value)} placeholder="Surtitre (français)" className={inputClass} />
+        <input value={form.eyebrow.en} onChange={e => setBilingual('eyebrow', 'en', e.target.value)} placeholder="Surtitre (anglais, optionnel)" className={inputClass} />
+        <input value={form.title.fr} onChange={e => setBilingual('title', 'fr', e.target.value)} placeholder="Titre (français)" className={inputClass} />
+        <input value={form.title.en} onChange={e => setBilingual('title', 'en', e.target.value)} placeholder="Titre (anglais, optionnel)" className={inputClass} />
+        <textarea value={form.intro.fr} onChange={e => setBilingual('intro', 'fr', e.target.value)} placeholder="Introduction (français)" rows={4} className={inputClass} />
+        <textarea value={form.intro.en} onChange={e => setBilingual('intro', 'en', e.target.value)} placeholder="Introduction (anglais, optionnel)" rows={4} className={inputClass} />
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={handleSave} disabled={saving}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors disabled:opacity-50">
+          <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer l\'introduction'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Atelier tab - étapes et photos affichées sur la page L'Atelier
 const AtelierTab: React.FC = () => {
   const [steps, setSteps] = useState<AtelierStep[]>([]);
@@ -1060,6 +1155,819 @@ const AtelierTab: React.FC = () => {
   );
 };
 
+// Engagements tab - cartes « Nos Engagements » de la section RSE
+const EngagementsTab: React.FC = () => {
+  const [commitments, setCommitments] = useState<RseCommitment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<RseCommitment | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [commitmentForm, setCommitmentForm] = useState({
+    icon: 'leaf',
+    color: RSE_COLORS[0].value,
+    titleFr: '',
+    titleEn: '',
+    descriptionFr: '',
+    descriptionEn: '',
+    sortOrder: '1',
+  });
+
+  const loadCommitments = async () => {
+    try {
+      setLoading(true);
+      const items = await getRseCommitments();
+      setCommitments(items);
+    } catch (error) {
+      console.error('Erreur lors du chargement des engagements:', error);
+      setCommitments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCommitments();
+  }, []);
+
+  const openCreateModal = () => {
+    setEditing(null);
+    setShowAdd(true);
+    setCommitmentForm({
+      icon: 'leaf',
+      color: RSE_COLORS[0].value,
+      titleFr: '',
+      titleEn: '',
+      descriptionFr: '',
+      descriptionEn: '',
+      sortOrder: String(commitments.length + 1),
+    });
+  };
+
+  const openEditModal = (commitment: RseCommitment) => {
+    setEditing(commitment);
+    setShowAdd(true);
+    setCommitmentForm({
+      icon: commitment.icon || 'leaf',
+      color: commitment.color || RSE_COLORS[0].value,
+      titleFr: commitment.title?.fr || '',
+      titleEn: commitment.title?.en || '',
+      descriptionFr: commitment.description?.fr || '',
+      descriptionEn: commitment.description?.en || '',
+      sortOrder: String(commitment.sortOrder || 1),
+    });
+  };
+
+  const closeModal = () => {
+    setEditing(null);
+    setShowAdd(false);
+  };
+
+  const handleSave = async () => {
+    if (!commitmentForm.titleFr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+
+    const payload: Partial<RseCommitment> = {
+      icon: commitmentForm.icon,
+      color: commitmentForm.color,
+      title: { fr: commitmentForm.titleFr.trim(), en: commitmentForm.titleEn.trim() || commitmentForm.titleFr.trim() },
+      description: { fr: commitmentForm.descriptionFr.trim(), en: commitmentForm.descriptionEn.trim() || commitmentForm.descriptionFr.trim() },
+      sortOrder: Number(commitmentForm.sortOrder) || commitments.length + 1,
+    };
+
+    try {
+      const result = editing
+        ? await updateRseCommitment(editing.id, payload)
+        : await createRseCommitment(payload);
+
+      if (!result) {
+        alert('Erreur lors de l\'enregistrement de l\'engagement.');
+        return;
+      }
+
+      closeModal();
+      await loadCommitments();
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement de l\'engagement:', error);
+      alert('Erreur lors de l\'enregistrement de l\'engagement.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet engagement ?')) return;
+
+    try {
+      await deleteRseCommitment(id);
+      await loadCommitments();
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'engagement:', error);
+      alert('Erreur lors de la suppression de l\'engagement.');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <h3 className="font-semibold text-[#2E4033]">{commitments.length} engagement(s)</h3>
+        <button onClick={openCreateModal}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors whitespace-nowrap">
+          <Plus size={14} /> Ajouter un engagement
+        </button>
+      </div>
+
+      {commitments.length === 0 && !loading && (
+        <div className="bg-[#FAF7F2] border border-[#E6DFD3] rounded-2xl p-4 text-sm text-[#2E4033]/60 flex items-start gap-2">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-[#C97A53]" />
+          <span>
+            Aucun engagement enregistré : la section « Nos Engagements » affiche pour l'instant les 4 engagements par défaut du site.
+            Dès que vous ajoutez un engagement ici, c'est cette liste qui est affichée.
+          </span>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#E6DFD3]">
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Ordre</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Engagement</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Description</th>
+                <th className="text-right p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E6DFD3]">
+              {loading && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Chargement…</td>
+                </tr>
+              )}
+
+              {!loading && commitments.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Aucun engagement pour le moment</td>
+                </tr>
+              )}
+
+              {commitments.map(commitment => {
+                const Icon = getRseIcon(commitment.icon);
+                return (
+                  <tr key={commitment.id} className="hover:bg-[#FAF7F2] transition-colors">
+                    <td className="p-4 text-[#2E4033]/50">{commitment.sortOrder}</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: commitment.color + '12', border: `1px solid ${commitment.color}20` }}
+                        >
+                          <Icon size={20} style={{ color: commitment.color }} strokeWidth={1.5} />
+                        </div>
+                        <div>
+                          <div className="font-medium text-[#2E4033]">{commitment.title.fr}</div>
+                          <div className="text-xs text-[#2E4033]/40">{commitment.title.en}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4 text-[#2E4033]/60 max-w-md">
+                      <p className="line-clamp-2">{commitment.description.fr}</p>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-1">
+                        <button onClick={() => openEditModal(commitment)}
+                          className="p-2 rounded-lg text-[#2E4033] hover:bg-[#E6DFD3] transition-colors" title="Modifier">
+                          <Pencil size={14} />
+                        </button>
+                        <button onClick={() => handleDelete(commitment.id)}
+                          className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Supprimer">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {(editing || showAdd) && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif font-semibold text-[#2E4033]">{editing ? 'Modifier l\'engagement' : 'Ajouter un engagement'}</h3>
+              <button onClick={closeModal} className="p-1 hover:bg-[#E6DFD3] rounded-lg">
+                <X size={18} className="text-[#2E4033]" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <input value={commitmentForm.titleFr} onChange={e => setCommitmentForm(prev => ({ ...prev, titleFr: e.target.value }))} placeholder="Titre (français)" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <input value={commitmentForm.titleEn} onChange={e => setCommitmentForm(prev => ({ ...prev, titleEn: e.target.value }))} placeholder="Titre (anglais, optionnel)" className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <textarea value={commitmentForm.descriptionFr} onChange={e => setCommitmentForm(prev => ({ ...prev, descriptionFr: e.target.value }))} placeholder="Description (français)" rows={3} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+              <textarea value={commitmentForm.descriptionEn} onChange={e => setCommitmentForm(prev => ({ ...prev, descriptionEn: e.target.value }))} placeholder="Description (anglais, optionnel)" rows={3} className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]" />
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Icône</label>
+                <div className="grid grid-cols-6 gap-2 mt-1">
+                  {Object.entries(RSE_ICONS).map(([name, { icon: Icon, label }]) => (
+                    <button
+                      key={name}
+                      type="button"
+                      title={label}
+                      onClick={() => setCommitmentForm(prev => ({ ...prev, icon: name }))}
+                      className={`aspect-square rounded-xl border flex items-center justify-center transition-colors ${commitmentForm.icon === name ? 'border-[#2E4033] bg-[#E6DFD3]' : 'border-[#E6DFD3] hover:bg-[#FAF7F2]'}`}
+                    >
+                      <Icon size={18} style={{ color: commitmentForm.color }} strokeWidth={1.5} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Couleur</label>
+                <div className="flex gap-2 mt-1">
+                  {RSE_COLORS.map(c => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setCommitmentForm(prev => ({ ...prev, color: c.value }))}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-[#2E4033] transition-colors ${commitmentForm.color === c.value ? 'border-[#2E4033] bg-[#FAF7F2]' : 'border-[#E6DFD3]'}`}
+                    >
+                      <span className="w-4 h-4 rounded-full" style={{ backgroundColor: c.value }} />
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Ordre d'affichage</label>
+                <input
+                  value={commitmentForm.sortOrder}
+                  onChange={e => setCommitmentForm(prev => ({ ...prev, sortOrder: e.target.value }))}
+                  type="number"
+                  min={1}
+                  placeholder="Ex: 1"
+                  className="w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033] mt-1"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button onClick={closeModal}
+                className="flex-1 py-2.5 border border-[#E6DFD3] rounded-xl text-sm font-medium text-[#2E4033] hover:bg-[#E6DFD3] transition-colors">
+                Annuler
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                className="flex-1 py-2.5 bg-[#2E4033] text-white rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors flex items-center justify-center gap-1 disabled:opacity-50">
+                <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Contenu actuel du bloc « L'Atelier » de l'accueil, proposé tant que rien n'est enregistré
+const DEFAULT_HOME_ATELIER: HomeAtelierSection = {
+  image: '',
+  label: { fr: 'L\'Atelier · Nature Raphia', en: 'The Workshop · Nature Raphia' },
+  title: { fr: 'Un savoir-faire tissé à la main.', en: 'Handcrafted expertise.' },
+  subtitle: {
+    fr: 'Depuis douze ans, nos artisanes transforment le raphia sauvage en pièces d\'exception. Chaque geste — récolte, teinture végétale, crochet — porte la mémoire des hautes terres malgaches.',
+    en: 'For twelve years, our artisans have transformed wild raphia into exceptional pieces. Each gesture — harvest, plant dyeing, crochet — carries the memory of the Malagasy highlands.',
+  },
+  cta: { fr: 'Notre Histoire', en: 'Our Story' },
+};
+
+// Bloc « L'Atelier » de la page d'accueil (onglet Accueil · Atelier)
+const HomeAtelierEditor: React.FC = () => {
+  const [form, setForm] = useState<HomeAtelierSection>(DEFAULT_HOME_ATELIER);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    getHomeAtelierSection()
+      .then(section => {
+        if (section) {
+          setForm(section);
+          setIsSaved(true);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const setBilingual = (field: 'label' | 'title' | 'subtitle' | 'cta', lang: 'fr' | 'en', value: string) => {
+    setForm(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      const result = await uploadAtelierImage(file);
+      if (result) {
+        setForm(prev => ({ ...prev, image: result }));
+      } else {
+        alert('Erreur lors de l\'upload de l\'image.');
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.title.fr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+    const result = await saveHomeAtelierSection({
+      image: form.image.trim(),
+      label: { fr: form.label.fr.trim(), en: form.label.en.trim() || form.label.fr.trim() },
+      title: { fr: form.title.fr.trim(), en: form.title.en.trim() || form.title.fr.trim() },
+      subtitle: { fr: form.subtitle.fr.trim(), en: form.subtitle.en.trim() || form.subtitle.fr.trim() },
+      cta: { fr: form.cta.fr.trim(), en: form.cta.en.trim() || form.cta.fr.trim() },
+    });
+    setSaving(false);
+
+    if (result) {
+      setForm(result);
+      setIsSaved(true);
+      alert('Section enregistrée.');
+    } else {
+      alert('Erreur lors de l\'enregistrement de la section.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-[#2E4033]/40">Chargement…</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
+      <div>
+        <h3 className="font-semibold text-[#2E4033]">Bloc « L'Atelier » de la page d'accueil</h3>
+        {!isSaved && (
+          <p className="text-xs text-[#2E4033]/50 mt-1">
+            Pas encore enregistré : le site affiche le contenu par défaut ci-dessous. Enregistrez pour le rendre modifiable.
+          </p>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <input value={form.label.fr} onChange={e => setBilingual('label', 'fr', e.target.value)} placeholder="Surtitre (français)" className={inputClass} />
+        <input value={form.label.en} onChange={e => setBilingual('label', 'en', e.target.value)} placeholder="Surtitre (anglais, optionnel)" className={inputClass} />
+        <input value={form.title.fr} onChange={e => setBilingual('title', 'fr', e.target.value)} placeholder="Titre (français)" className={inputClass} />
+        <input value={form.title.en} onChange={e => setBilingual('title', 'en', e.target.value)} placeholder="Titre (anglais, optionnel)" className={inputClass} />
+        <textarea value={form.subtitle.fr} onChange={e => setBilingual('subtitle', 'fr', e.target.value)} placeholder="Texte (français)" rows={4} className={inputClass} />
+        <textarea value={form.subtitle.en} onChange={e => setBilingual('subtitle', 'en', e.target.value)} placeholder="Texte (anglais, optionnel)" rows={4} className={inputClass} />
+        <input value={form.cta.fr} onChange={e => setBilingual('cta', 'fr', e.target.value)} placeholder="Texte du bouton (français)" className={inputClass} />
+        <input value={form.cta.en} onChange={e => setBilingual('cta', 'en', e.target.value)} placeholder="Texte du bouton (anglais, optionnel)" className={inputClass} />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-[#2E4033]/50">Photo (laisser vide pour la photo par défaut)</label>
+        <img src={form.image || homeAtelierDefaultImage} alt="Aperçu" className="w-full max-w-sm h-48 rounded-xl object-cover" />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input value={form.image} onChange={e => setForm(prev => ({ ...prev, image: e.target.value }))} placeholder="URL de la photo ou upload" className={inputClass} />
+          {form.image && (
+            <button type="button" onClick={() => setForm(prev => ({ ...prev, image: '' }))}
+              className="px-3 py-2 border border-[#E6DFD3] rounded-xl text-xs text-[#2E4033] hover:bg-[#E6DFD3] whitespace-nowrap">
+              Photo par défaut
+            </button>
+          )}
+        </div>
+        <input type="file" accept="image/*" onChange={async e => { const file = e.target.files?.[0]; if (file) await handleImageUpload(file); }} className="w-full px-3 py-2 border border-[#E6DFD3] rounded-xl text-xs text-[#2E4033]" />
+        {uploading && <p className="text-xs text-[#2E4033]/50">Upload en cours…</p>}
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={handleSave} disabled={saving || uploading}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors disabled:opacity-50">
+          <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer la section'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Bloc « L'autonomisation des femmes artisanes » (onglet Femmes artisanes)
+const WomenSectionEditor: React.FC = () => {
+  const [form, setForm] = useState<RseWomenSection>(DEFAULT_RSE_WOMEN_SECTION);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingSlot, setUploadingSlot] = useState<keyof RseWomenSection['images'] | null>(null);
+
+  useEffect(() => {
+    getRseWomenSection()
+      .then(section => {
+        if (section) {
+          setForm(section);
+          setIsSaved(true);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const setBilingual = (field: 'title' | 'description' | 'badgeTitle' | 'badgeSubtitle', lang: 'fr' | 'en', value: string) => {
+    setForm(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
+  const setImage = (slot: keyof RseWomenSection['images'], value: string) => {
+    setForm(prev => ({ ...prev, images: { ...prev.images, [slot]: value } }));
+  };
+
+  const setStat = (index: number, patch: Partial<RseStat>) => {
+    setForm(prev => ({
+      ...prev,
+      stats: prev.stats.map((s, i) => (i === index ? { ...s, ...patch } : s)),
+    }));
+  };
+
+  const handleImageUpload = async (slot: keyof RseWomenSection['images'], file: File) => {
+    try {
+      setUploadingSlot(slot);
+      const result = await uploadRseImage(file);
+      if (result) {
+        setImage(slot, result);
+      } else {
+        alert('Erreur lors de l\'upload de l\'image.');
+      }
+    } finally {
+      setUploadingSlot(null);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.title.fr.trim()) {
+      alert('Le titre est obligatoire.');
+      return;
+    }
+
+    setSaving(true);
+    const result = await saveRseWomenSection({
+      ...form,
+      title: { fr: form.title.fr.trim(), en: form.title.en.trim() || form.title.fr.trim() },
+      description: { fr: form.description.fr.trim(), en: form.description.en.trim() || form.description.fr.trim() },
+    });
+    setSaving(false);
+
+    if (result) {
+      setForm(result);
+      setIsSaved(true);
+      alert('Section enregistrée.');
+    } else {
+      alert('Erreur lors de l\'enregistrement de la section.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+  const imageSlots: { slot: keyof RseWomenSection['images']; label: string }[] = [
+    { slot: 'main', label: 'Grande photo (gauche)' },
+    { slot: 'top', label: 'Petite photo (haut)' },
+    { slot: 'bottom', label: 'Petite photo (bas)' },
+  ];
+
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-sm text-[#2E4033]/40">Chargement…</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
+      <div>
+        <h3 className="font-semibold text-[#2E4033]">L'autonomisation des femmes artisanes</h3>
+        {!isSaved && (
+          <p className="text-xs text-[#2E4033]/50 mt-1">
+            Pas encore enregistrée : le site affiche le contenu par défaut ci-dessous. Enregistrez pour le rendre modifiable.
+          </p>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <input value={form.title.fr} onChange={e => setBilingual('title', 'fr', e.target.value)} placeholder="Titre (français)" className={inputClass} />
+        <input value={form.title.en} onChange={e => setBilingual('title', 'en', e.target.value)} placeholder="Titre (anglais, optionnel)" className={inputClass} />
+        <textarea value={form.description.fr} onChange={e => setBilingual('description', 'fr', e.target.value)} placeholder="Texte (français)" rows={4} className={inputClass} />
+        <textarea value={form.description.en} onChange={e => setBilingual('description', 'en', e.target.value)} placeholder="Texte (anglais, optionnel)" rows={4} className={inputClass} />
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-[#2E4033]/50">Photos</label>
+        <div className="grid md:grid-cols-3 gap-4 mt-1">
+          {imageSlots.map(({ slot, label }) => (
+            <div key={slot} className="space-y-2">
+              <div className="text-xs text-[#2E4033]/60">{label}</div>
+              {form.images[slot] && <img src={form.images[slot]} alt={label} className="w-full h-32 rounded-xl object-cover" />}
+              <input value={form.images[slot]} onChange={e => setImage(slot, e.target.value)} placeholder="URL de la photo ou upload" className={inputClass} />
+              <input type="file" accept="image/*" onChange={async e => { const file = e.target.files?.[0]; if (file) await handleImageUpload(slot, file); }} className="w-full px-3 py-2 border border-[#E6DFD3] rounded-xl text-xs text-[#2E4033]" />
+              {uploadingSlot === slot && <p className="text-xs text-[#2E4033]/50">Upload en cours…</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-[#2E4033]/50">Badge sur les photos</label>
+        <div className="grid md:grid-cols-2 gap-3 mt-1">
+          <input value={form.badgeTitle.fr} onChange={e => setBilingual('badgeTitle', 'fr', e.target.value)} placeholder="Titre du badge (français)" className={inputClass} />
+          <input value={form.badgeTitle.en} onChange={e => setBilingual('badgeTitle', 'en', e.target.value)} placeholder="Titre du badge (anglais)" className={inputClass} />
+          <input value={form.badgeSubtitle.fr} onChange={e => setBilingual('badgeSubtitle', 'fr', e.target.value)} placeholder="Sous-titre du badge (français)" className={inputClass} />
+          <input value={form.badgeSubtitle.en} onChange={e => setBilingual('badgeSubtitle', 'en', e.target.value)} placeholder="Sous-titre du badge (anglais)" className={inputClass} />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-[#2E4033]/50">Chiffres clés</label>
+        <div className="grid md:grid-cols-3 gap-4 mt-1">
+          {form.stats.map((stat, i) => (
+            <div key={i} className="space-y-2 p-3 bg-[#FAF7F2] rounded-xl">
+              <input value={stat.num} onChange={e => setStat(i, { num: e.target.value })} placeholder="Chiffre (ex : 40+)" className={inputClass} />
+              <input value={stat.label.fr} onChange={e => setStat(i, { label: { ...stat.label, fr: e.target.value } })} placeholder="Libellé (français)" className={inputClass} />
+              <input value={stat.label.en} onChange={e => setStat(i, { label: { ...stat.label, en: e.target.value } })} placeholder="Libellé (anglais)" className={inputClass} />
+              <div className="grid grid-cols-6 gap-1">
+                {Object.entries(RSE_ICONS).map(([name, { icon: Icon, label }]) => (
+                  <button
+                    key={name}
+                    type="button"
+                    title={label}
+                    onClick={() => setStat(i, { icon: name })}
+                    className={`aspect-square rounded-lg border flex items-center justify-center transition-colors ${stat.icon === name ? 'border-[#2E4033] bg-[#E6DFD3]' : 'border-[#E6DFD3] bg-white hover:bg-[#FAF7F2]'}`}
+                  >
+                    <Icon size={14} className="text-[#C97A53]" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={handleSave} disabled={saving || uploadingSlot !== null}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors disabled:opacity-50">
+          <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer la section'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Témoignages tab - « Regards de nos partenaires » sur la page d'accueil
+const TestimonialsTab: React.FC = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Testimonial | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const emptyForm = (sortOrder: number) => ({
+    quoteFr: '',
+    quoteEn: '',
+    name: '',
+    roleFr: '',
+    roleEn: '',
+    rating: 5,
+    sortOrder: String(sortOrder),
+  });
+  const [testimonialForm, setTestimonialForm] = useState(emptyForm(1));
+
+  const loadTestimonials = async () => {
+    try {
+      setLoading(true);
+      setTestimonials(await getTestimonials());
+    } catch (error) {
+      console.error('Erreur lors du chargement des témoignages:', error);
+      setTestimonials([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const openCreateModal = () => {
+    setEditing(null);
+    setShowAdd(true);
+    setTestimonialForm(emptyForm(testimonials.length + 1));
+  };
+
+  const openEditModal = (testimonial: Testimonial) => {
+    setEditing(testimonial);
+    setShowAdd(true);
+    setTestimonialForm({
+      quoteFr: testimonial.quote?.fr || '',
+      quoteEn: testimonial.quote?.en || '',
+      name: testimonial.name || '',
+      roleFr: testimonial.role?.fr || '',
+      roleEn: testimonial.role?.en || '',
+      rating: testimonial.rating || 5,
+      sortOrder: String(testimonial.sortOrder || 1),
+    });
+  };
+
+  const closeModal = () => {
+    setEditing(null);
+    setShowAdd(false);
+  };
+
+  const handleSave = async () => {
+    if (!testimonialForm.quoteFr.trim() || !testimonialForm.name.trim()) {
+      alert('Le témoignage et le nom sont obligatoires.');
+      return;
+    }
+
+    setSaving(true);
+
+    const payload: Partial<Testimonial> = {
+      quote: { fr: testimonialForm.quoteFr.trim(), en: testimonialForm.quoteEn.trim() || testimonialForm.quoteFr.trim() },
+      name: testimonialForm.name.trim(),
+      role: { fr: testimonialForm.roleFr.trim(), en: testimonialForm.roleEn.trim() || testimonialForm.roleFr.trim() },
+      rating: testimonialForm.rating,
+      sortOrder: Number(testimonialForm.sortOrder) || testimonials.length + 1,
+    };
+
+    try {
+      const result = editing
+        ? await updateTestimonial(editing.id, payload)
+        : await createTestimonial(payload);
+
+      if (!result) {
+        alert('Erreur lors de l\'enregistrement du témoignage.');
+        return;
+      }
+
+      closeModal();
+      await loadTestimonials();
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement du témoignage:', error);
+      alert('Erreur lors de l\'enregistrement du témoignage.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce témoignage ?')) return;
+
+    try {
+      await deleteTestimonial(id);
+      await loadTestimonials();
+    } catch (error) {
+      console.error('Erreur lors de la suppression du témoignage:', error);
+      alert('Erreur lors de la suppression du témoignage.');
+    }
+  };
+
+  const inputClass = 'w-full px-3 py-2.5 border border-[#E6DFD3] rounded-xl text-sm focus:outline-none focus:border-[#2E4033] text-[#2E4033]';
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <h3 className="font-semibold text-[#2E4033]">{testimonials.length} témoignage(s)</h3>
+        <button onClick={openCreateModal}
+          className="flex items-center gap-2 bg-[#2E4033] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors whitespace-nowrap">
+          <Plus size={14} /> Ajouter un témoignage
+        </button>
+      </div>
+
+      {testimonials.length === 0 && !loading && (
+        <div className="bg-[#FAF7F2] border border-[#E6DFD3] rounded-2xl p-4 text-sm text-[#2E4033]/60 flex items-start gap-2">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-[#C97A53]" />
+          <span>
+            Aucun témoignage enregistré : la section « Regards de nos partenaires » affiche pour l'instant les 4 témoignages par défaut du site.
+            Dès que vous ajoutez un témoignage ici, c'est cette liste qui est affichée.
+          </span>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#E6DFD3]">
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Ordre</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Partenaire</th>
+                <th className="text-left p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Témoignage</th>
+                <th className="text-right p-4 text-xs font-semibold text-[#2E4033]/50 uppercase tracking-widest">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E6DFD3]">
+              {loading && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Chargement…</td>
+                </tr>
+              )}
+
+              {!loading && testimonials.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-[#2E4033]/40">Aucun témoignage pour le moment</td>
+                </tr>
+              )}
+
+              {testimonials.map(testimonial => (
+                <tr key={testimonial.id} className="hover:bg-[#FAF7F2] transition-colors">
+                  <td className="p-4 text-[#2E4033]/50">{testimonial.sortOrder}</td>
+                  <td className="p-4">
+                    <div className="font-medium text-[#2E4033]">{testimonial.name}</div>
+                    <div className="text-xs text-[#2E4033]/40">{testimonial.role.fr}</div>
+                    <div className="flex gap-0.5 mt-1">
+                      {[...Array(testimonial.rating)].map((_, j) => (
+                        <Star key={j} size={10} className="fill-[#C97A53] text-[#C97A53]" />
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-4 text-[#2E4033]/60 max-w-md">
+                    <p className="line-clamp-2 italic">« {testimonial.quote.fr} »</p>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEditModal(testimonial)}
+                        className="p-2 rounded-lg text-[#2E4033] hover:bg-[#E6DFD3] transition-colors" title="Modifier">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(testimonial.id)}
+                        className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Supprimer">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {(editing || showAdd) && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif font-semibold text-[#2E4033]">{editing ? 'Modifier le témoignage' : 'Ajouter un témoignage'}</h3>
+              <button onClick={closeModal} className="p-1 hover:bg-[#E6DFD3] rounded-lg">
+                <X size={18} className="text-[#2E4033]" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <textarea value={testimonialForm.quoteFr} onChange={e => setTestimonialForm(prev => ({ ...prev, quoteFr: e.target.value }))} placeholder="Témoignage (français)" rows={3} className={inputClass} />
+              <textarea value={testimonialForm.quoteEn} onChange={e => setTestimonialForm(prev => ({ ...prev, quoteEn: e.target.value }))} placeholder="Témoignage (anglais, optionnel)" rows={3} className={inputClass} />
+              <input value={testimonialForm.name} onChange={e => setTestimonialForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nom (ex : Camille R.)" className={inputClass} />
+              <input value={testimonialForm.roleFr} onChange={e => setTestimonialForm(prev => ({ ...prev, roleFr: e.target.value }))} placeholder="Activité et ville (français, ex : Concept-store, Paris)" className={inputClass} />
+              <input value={testimonialForm.roleEn} onChange={e => setTestimonialForm(prev => ({ ...prev, roleEn: e.target.value }))} placeholder="Activité et ville (anglais, optionnel)" className={inputClass} />
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Note</label>
+                <div className="flex gap-1 mt-1">
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button key={n} type="button" onClick={() => setTestimonialForm(prev => ({ ...prev, rating: n }))} className="p-1" title={`${n} étoile(s)`}>
+                      <Star size={20} className={n <= testimonialForm.rating ? 'fill-[#C97A53] text-[#C97A53]' : 'text-[#E6DFD3]'} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#2E4033]/50">Ordre d'affichage</label>
+                <input
+                  value={testimonialForm.sortOrder}
+                  onChange={e => setTestimonialForm(prev => ({ ...prev, sortOrder: e.target.value }))}
+                  type="number"
+                  min={1}
+                  placeholder="Ex: 1"
+                  className={`${inputClass} mt-1`}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button onClick={closeModal}
+                className="flex-1 py-2.5 border border-[#E6DFD3] rounded-xl text-sm font-medium text-[#2E4033] hover:bg-[#E6DFD3] transition-colors">
+                Annuler
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                className="flex-1 py-2.5 bg-[#2E4033] text-white rounded-xl text-sm font-medium hover:bg-[#1a2b1f] transition-colors flex items-center justify-center gap-1 disabled:opacity-50">
+                <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Quotes tab - Sans bouton de suppression
 const QuotesTab: React.FC<{
   quotes: QuoteRequest[];
@@ -1186,7 +2094,7 @@ const QuotesTab: React.FC<{
 // Main Admin Panel
 const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'atelier' | 'quotes'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'homeAtelier' | 'atelier' | 'engagements' | 'artisanes' | 'testimonials' | 'quotes'>('dashboard');
   const { quotes, updateQuoteStatus } = useCart();
 
   if (!isLoggedIn) {
@@ -1203,7 +2111,11 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const tabs = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
     { id: 'products', icon: Package, label: 'Produits' },
+    { id: 'homeAtelier', icon: Home, label: 'Accueil · Atelier' },
     { id: 'atelier', icon: ImageIcon, label: 'Atelier' },
+    { id: 'engagements', icon: Leaf, label: 'Engagements' },
+    { id: 'artisanes', icon: Users, label: 'Femmes artisanes' },
+    { id: 'testimonials', icon: MessageSquareQuote, label: 'Témoignages' },
     { id: 'quotes', icon: FileText, label: `Devis (${quotes.filter(q => q.status === 'nouveau').length})` },
   ];
 
@@ -1267,7 +2179,16 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="p-6">
           {activeTab === 'dashboard' && <DashboardTab quotes={quotes} />}
           {activeTab === 'products' && <ProductsTab />}
-          {activeTab === 'atelier' && <AtelierTab />}
+          {activeTab === 'homeAtelier' && <HomeAtelierEditor />}
+          {activeTab === 'atelier' && (
+            <div className="space-y-8">
+              <AtelierHeaderEditor />
+              <AtelierTab />
+            </div>
+          )}
+          {activeTab === 'engagements' && <EngagementsTab />}
+          {activeTab === 'artisanes' && <WomenSectionEditor />}
+          {activeTab === 'testimonials' && <TestimonialsTab />}
           {activeTab === 'quotes' && <QuotesTab quotes={quotes} updateStatus={updateQuoteStatus} />}
         </div>
       </main>

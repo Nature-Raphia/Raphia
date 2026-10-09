@@ -1,42 +1,66 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Leaf, Hand, Heart, Droplets, Quote, Users, Award, Clock, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
+import { getRseCommitments, getRseWomenSection } from '../services/rseService';
+import { DEFAULT_RSE_WOMEN_SECTION, getRseIcon } from '../data/rseIcons';
+import type { RseCommitment, RseWomenSection } from '../types';
 
-const commitments = [
-  {
-    icon: Leaf,
-    titleKey: 'rse.card1.title',
-    descKey: 'rse.card1.desc',
-    color: '#2E4033',
-    gradient: 'from-[#2E4033]/5 to-[#2E4033]/10'
-  },
-  {
-    icon: Hand,
-    titleKey: 'rse.card2.title',
-    descKey: 'rse.card2.desc',
-    color: '#C97A53',
-    gradient: 'from-[#C97A53]/5 to-[#C97A53]/10'
-  },
-  {
-    icon: Heart,
-    titleKey: 'rse.card3.title',
-    descKey: 'rse.card3.desc',
-    color: '#2E4033',
-    gradient: 'from-[#2E4033]/5 to-[#2E4033]/10'
-  },
-  {
-    icon: Droplets,
-    titleKey: 'rse.card4.title',
-    descKey: 'rse.card4.desc',
-    color: '#C97A53',
-    gradient: 'from-[#C97A53]/5 to-[#C97A53]/10'
-  },
+// Engagements affichés tant qu'aucun engagement n'a été saisi depuis l'espace admin
+const FALLBACK_COMMITMENTS = [
+  { icon: 'leaf', color: '#2E4033' },
+  { icon: 'hand', color: '#C97A53' },
+  { icon: 'heart', color: '#2E4033' },
+  { icon: 'droplets', color: '#C97A53' },
 ];
 
 const RSE: React.FC = () => {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [dbCommitments, setDbCommitments] = useState<RseCommitment[] | null>(null);
+  const [dbWomen, setDbWomen] = useState<RseWomenSection | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getRseCommitments().then(rows => {
+      if (cancelled || rows.length === 0) return;
+      setDbCommitments(rows);
+    });
+
+    getRseWomenSection().then(section => {
+      if (cancelled || !section) return;
+      setDbWomen(section);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const commitments = dbCommitments
+    ? dbCommitments.map(item => ({
+        icon: getRseIcon(item.icon),
+        color: item.color,
+        title: item.title[lang] || item.title.fr,
+        text: item.description[lang] || item.description.fr,
+      }))
+    : FALLBACK_COMMITMENTS.map((item, idx) => ({
+        icon: getRseIcon(item.icon),
+        color: item.color,
+        title: t(`rse.card${idx + 1}.title`),
+        text: t(`rse.card${idx + 1}.desc`),
+      }));
+
+  const womenSection = dbWomen ?? DEFAULT_RSE_WOMEN_SECTION;
+  const women = {
+    title: womenSection.title[lang] || womenSection.title.fr,
+    text: womenSection.description[lang] || womenSection.description.fr,
+    images: womenSection.images,
+    badgeTitle: womenSection.badgeTitle[lang] || womenSection.badgeTitle.fr,
+    badgeSubtitle: womenSection.badgeSubtitle[lang] || womenSection.badgeSubtitle.fr,
+    stats: womenSection.stats,
+  };
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => {
@@ -84,7 +108,10 @@ const RSE: React.FC = () => {
                 }}
               >
                 {/* Background gradient subtle */}
-                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ backgroundImage: `linear-gradient(to bottom right, ${item.color}0D, ${item.color}1A)` }}
+                />
 
                 {/* Icon avec cercle élégant */}
                 <div className="relative">
@@ -100,10 +127,10 @@ const RSE: React.FC = () => {
                 </div>
 
                 <h3 className="font-serif text-xl font-medium text-[#2E4033] mb-3 group-hover:text-[#C97A53] transition-colors duration-300">
-                  {t(item.titleKey)}
+                  {item.title}
                 </h3>
                 <p className="text-sm text-[#2E4033]/60 leading-relaxed">
-                  {t(item.descKey)}
+                  {item.text}
                 </p>
 
                 {/* Ligne décorative */}
@@ -123,21 +150,21 @@ const RSE: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-3xl overflow-hidden aspect-[4/5] row-span-2 shadow-xl">
                 <img
-                  src="/nature.jpg"  // Ajoutez le slash au début
+                  src={women.images.main}
                   alt="Artisane Nature Raphia"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
               <div className="rounded-3xl overflow-hidden aspect-square shadow-lg">
                 <img
-                  src="/vegetal.jpg"  // Ajoutez le slash au début
+                  src={women.images.top}
                   alt="Teinture végétale"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
               <div className="rounded-3xl overflow-hidden aspect-square shadow-lg relative">
                 <img
-                  src="/1.jpg"
+                  src={women.images.bottom}
                   alt="Création raphia"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
@@ -152,8 +179,8 @@ const RSE: React.FC = () => {
                   <Sparkles size={18} className="text-[#C97A53]" />
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-[#2E4033]">Artisanat d'exception</div>
-                  <div className="text-[10px] text-[#2E4033]/50">Savoir-faire unique</div>
+                  <div className="text-xs font-medium text-[#2E4033]">{women.badgeTitle}</div>
+                  <div className="text-[10px] text-[#2E4033]/50">{women.badgeSubtitle}</div>
                 </div>
               </div>
             </div>
@@ -164,21 +191,17 @@ const RSE: React.FC = () => {
           
 
             <h3 className="font-serif text-3xl md:text-4xl font-light text-[#2E4033] mb-4 leading-tight">
-              {t('rse.women.title')}
+              {women.title}
             </h3>
 
             <p className="text-[#2E4033]/60 leading-relaxed mb-10 text-base">
-              {t('rse.women.desc')}
+              {women.text}
             </p>
 
             {/* Stats avec design raffiné */}
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { num: '40+', label: { fr: 'Artisanes', en: 'Artisans' }, icon: Users },
-                { num: '12', label: { fr: "Ans d'expertise", en: 'Years' }, icon: Award },
-                { num: '0%', label: { fr: 'Chimique', en: 'Chemical' }, icon: Leaf },
-              ].map((s, i) => {
-                const StatIcon = s.icon;
+              {women.stats.map((s, i) => {
+                const StatIcon = getRseIcon(s.icon);
                 return (
                   <div key={i} className="group text-center p-4 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                     <div className="flex justify-center mb-2">
@@ -187,7 +210,7 @@ const RSE: React.FC = () => {
                       </div>
                     </div>
                     <div className="font-serif text-2xl font-light text-[#C97A53]">{s.num}</div>
-                    <div className="text-[10px] text-[#2E4033]/50 uppercase tracking-wider mt-1">{s.label.fr}</div>
+                    <div className="text-[10px] text-[#2E4033]/50 uppercase tracking-wider mt-1">{s.label[lang] || s.label.fr}</div>
                   </div>
                 );
               })}

@@ -11,4 +11,4 @@ VITE_EMAILJS_CONTACT_TEMPLATE_ID=template_9b39qsz
 
 
 
-mixmymh le contact, 
+mixmymh le contact, de le supabase  

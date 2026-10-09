@@ -19,6 +19,53 @@ export interface AtelierStep {
   sortOrder: number;
 }
 
+export interface AtelierPageHeader {
+  eyebrow: { fr: string; en: string };
+  title: { fr: string; en: string };
+  intro: { fr: string; en: string };
+}
+
+export interface HomeAtelierSection {
+  image: string;
+  label: { fr: string; en: string };
+  title: { fr: string; en: string };
+  subtitle: { fr: string; en: string };
+  cta: { fr: string; en: string };
+}
+
+export interface RseCommitment {
+  id: string;
+  icon: string;
+  color: string;
+  title: { fr: string; en: string };
+  description: { fr: string; en: string };
+  sortOrder: number;
+}
+
+export interface RseStat {
+  num: string;
+  icon: string;
+  label: { fr: string; en: string };
+}
+
+export interface RseWomenSection {
+  title: { fr: string; en: string };
+  description: { fr: string; en: string };
+  images: { main: string; top: string; bottom: string };
+  badgeTitle: { fr: string; en: string };
+  badgeSubtitle: { fr: string; en: string };
+  stats: RseStat[];
+}
+
+export interface Testimonial {
+  id: string;
+  quote: { fr: string; en: string };
+  name: string;
+  role: { fr: string; en: string };
+  rating: number;
+  sortOrder: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
