@@ -19,6 +19,15 @@ export interface AtelierStep {
   sortOrder: number;
 }
 
+export interface RseCommitment {
+  id: string;
+  icon: string;
+  color: string;
+  title: { fr: string; en: string };
+  description: { fr: string; en: string };
+  sortOrder: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
