@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, Globe, Phone, Users, Home, BookOpen, FileText, MapPin, ShoppingBag } from 'lucide-react';
+import { Menu, X, Globe, Phone, Users, Home, BookOpen, FileText, MapPin, ShoppingBag, LogIn } from 'lucide-react';
 import { useLang } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
@@ -99,9 +99,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
 
               <button
                 onClick={onAdminClick}
-                className="hidden md:flex text-xs text-[#2E4033]/40 hover:text-[#2E4033] transition-colors px-2"
+                className="hidden md:flex items-center gap-1.5 text-xs font-medium text-white bg-[#2E4033] hover:bg-[#C97A53] transition-colors rounded-full px-4 py-2"
               >
-                ⚙
+                <LogIn size={14} />
+                <span>{lang === 'fr' ? 'Se connecter' : 'Log in'}</span>
               </button>
 
               <button
